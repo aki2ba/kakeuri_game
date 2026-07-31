@@ -2,11 +2,13 @@ name: Deploy to GitHub Pages
 
 # 既定ブランチへの push で https://aki2ba.github.io/kakeuri_game/ に公開する。
 #
-# configure-pages に enablement: true を渡しているので、Pages が未設定でも
-# このワークフロー自身が「GitHub Actions からのデプロイ」を有効化する。
-# ただし Pages が使えないプラン・可視性の組み合わせでは有効化できない。
-# 非公開リポジトリで Pages を使うには GitHub Pro / Team / Enterprise が要る
-# （Free プランなら、リポジトリを公開に切り替えれば使える）。
+# 【最初に1回だけ必要な設定】
+#   Settings → Pages → Build and deployment → Source を「GitHub Actions」にする。
+#
+# enablement: true を付けているが、Pages サイトが存在しない状態からの「作成」は
+# Actions の GITHUB_TOKEN では実行できず（Resource not accessible by integration）、
+# 自動では有効化できない。上の設定を1回開くのが唯一の確実な方法である。
+# 設定後は enablement: true が既存サイトを確認するだけになり、以後は全自動で公開される。
 
 on:
   push:

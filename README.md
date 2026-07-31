@@ -44,7 +44,17 @@ node tools/selftest.mjs --sim    # ＋ 10シードの通し実行でバランス
 
 `index.html` がリポジトリ直下にあるので、そのまま静的サイトとして公開できる。既定ブランチ（`master`）に push すると `.github/workflows/pages.yml` が走り、セルフテストが通れば https://aki2ba.github.io/kakeuri_game/ に公開される。
 
-`configure-pages` に `enablement: true` を渡しているので、**Pages が未設定でもワークフロー自身が有効化する**。手作業の設定は要らない。
+### 最初に1回だけ必要な設定
+
+**Settings → Pages → Build and deployment → Source** を **「GitHub Actions」** にする。ブラウザからしかできない（GitHub のモバイルアプリにはリポジトリ設定の画面がない）。
+
+ワークフローには `configure-pages` の `enablement: true` を付けてあるが、**Pages サイトが存在しない状態からの「作成」は Actions の `GITHUB_TOKEN` では実行できない**。`permissions: pages: write` を与えても次のエラーになる。
+
+```
+Create Pages site failed. Error: Resource not accessible by integration
+```
+
+管理者権限の PAT をシークレットに登録すれば自動化できるが、設定を1回開くほうが早い。設定後は `enablement: true` が既存サイトを確認するだけになり、以後の公開は全自動になる。
 
 ### 前提: リポジトリは公開であること
 
