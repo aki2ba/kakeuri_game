@@ -1,7 +1,12 @@
 name: Deploy to GitHub Pages
 
 # 既定ブランチへの push で https://aki2ba.github.io/kakeuri_game/ に公開する。
-# リポジトリ設定で Settings → Pages → Source を「GitHub Actions」にしておくこと。
+#
+# configure-pages に enablement: true を渡しているので、Pages が未設定でも
+# このワークフロー自身が「GitHub Actions からのデプロイ」を有効化する。
+# ただし Pages が使えないプラン・可視性の組み合わせでは有効化できない。
+# 非公開リポジトリで Pages を使うには GitHub Pro / Team / Enterprise が要る
+# （Free プランなら、リポジトリを公開に切り替えれば使える）。
 
 on:
   push:
@@ -32,7 +37,10 @@ jobs:
       - name: セルフテスト
         run: node tools/selftest.mjs
 
+      # Pages が未設定なら、ここで「GitHub Actions からのデプロイ」を有効化する
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
