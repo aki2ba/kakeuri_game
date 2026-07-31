@@ -42,13 +42,22 @@ node tools/selftest.mjs --sim    # ＋ 10シードの通し実行でバランス
 
 ## GitHub Pages の公開設定
 
-`index.html` がリポジトリ直下にあるので、そのまま静的サイトとして公開できる。初回だけリポジトリ側の設定が要る。
+`index.html` がリポジトリ直下にあるので、そのまま静的サイトとして公開できる。既定ブランチ（`master`）に push すると `.github/workflows/pages.yml` が走り、セルフテストが通れば https://aki2ba.github.io/kakeuri_game/ に公開される。
 
-1. **Settings → Pages → Build and deployment → Source** を **「GitHub Actions」** にする
-2. 既定ブランチ（`master`）に push すると `.github/workflows/pages.yml` が走り、セルフテストが通れば公開される
-3. 公開先は https://aki2ba.github.io/kakeuri_game/
+`configure-pages` に `enablement: true` を渡しているので、**Pages が未設定でもワークフロー自身が有効化する**。手作業の設定は要らない。
 
-Source を「Deploy from a branch」（`master` / `(root)`）にしても同じように公開できる。その場合はワークフローが不要になるかわりに、公開前のセルフテストも走らない。
+### 前提: リポジトリは公開であること
+
+このリポジトリは公開なので、Free プランのまま Pages が使える。**非公開リポジトリで Pages を使うには GitHub Pro / Team / Enterprise が必要**で、Free プランの非公開リポジトリでは `configure-pages` が次のエラーで落ちる。
+
+```
+Get Pages site failed. Please verify that the repository has Pages enabled
+and configured to build using GitHub Actions ... Error: Not Found
+```
+
+なお、**公開されたページは可視性やプランに関わらず、URL を知っていれば誰でも見られる**（閲覧者を制限できるのは Enterprise Cloud のみ）。本ゲームは単一HTMLにJSをインラインで持つ構成なので、ページを公開した時点でソースは「ソースを表示」から読める。非公開にしたい場合は Pages を使わず、`index.html` を配布して各自ブラウザで開けばよい（`file://` でも完全に動く）。
+
+手動で **Settings → Pages → Source** を「Deploy from a branch」（`master` / `(root)`）にしても公開できるが、その場合は公開前のセルフテストが走らない。
 
 `.nojekyll` を置いてあるので、Jekyll による処理は行われずファイルがそのまま配信される。
 
