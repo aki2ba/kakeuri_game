@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>掛売り三年 ― 経営ゲーム</title>
+<title>掛売り三年 ― 掛取引の商習慣と債権保全・回収を学ぶ経営ゲーム</title>
+<meta name="description" content="卸売会社の社長として36ヶ月を生き延びる経営シミュレーション。支払サイト、与信限度額、債権保全、回収法務を遊びながら学ぶ。">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="掛売り三年">
+<meta property="og:description" content="売った代金が返ってこない・返ってくるのが遅すぎる。掛取引の商習慣と債権の保全・回収を学ぶ経営ゲーム。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231f5f8b'/%3E%3Ctext x='32' y='46' font-size='42' text-anchor='middle' fill='%23fff' font-family='serif'%3E%E6%8E%9B%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f4f2ec; --panel:#ffffff; --panel2:#faf8f3; --ink:#1d2025; --ink2:#5b6270;
@@ -96,9 +102,19 @@ ul.tight{margin:4px 0;padding-left:20px}
 ul.tight li{margin:2px 0}
 .badge{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px}
 .center{text-align:center}
+.narrow-note{display:none}
+@media(max-width:700px){
+  .narrow-note{display:block;background:var(--chip);color:var(--ink2);font-size:12px;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .wrap{padding:10px 10px 50px}
+  h1{font-size:17px}
+  .kpi{gap:10px}
+  .kpi b{font-size:15px}
+  .modal{padding:12px}
+}
 </style>
 </head>
 <body>
+<div class="narrow-note">この画面はタブレット以上の幅（およそ820px以上）を想定しています。横向きにするか、広い画面で開いてください。表は指で横にスクロールできます。</div>
 <div class="wrap" id="app"></div>
 <div id="modalRoot"></div>
 <script>
