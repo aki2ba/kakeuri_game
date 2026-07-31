@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>掛売り三年 ― 掛取引の商習慣と債権保全・回収を学ぶ経営ゲーム</title>
+<meta name="description" content="卸売会社の社長として36ヶ月を生き延びる経営シミュレーション。支払サイト、与信限度額、債権保全、回収法務を遊びながら学ぶ。">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="掛売り三年">
+<meta property="og:description" content="売った代金が返ってこない・返ってくるのが遅すぎる。掛取引の商習慣と債権の保全・回収を学ぶ経営ゲーム。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231f5f8b'/%3E%3Ctext x='32' y='46' font-size='42' text-anchor='middle' fill='%23fff' font-family='serif'%3E%E6%8E%9B%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4f2ec; --panel:#ffffff; --panel2:#faf8f3; --ink:#1d2025; --ink2:#5b6270;
+  --line:#d8d3c6; --accent:#1f5f8b; --accent2:#2c7fb8; --good:#16794a; --warn:#b06a00;
+  --bad:#b0392f; --chip:#eceadf; --shadow:0 1px 2px rgba(0,0,0,.08);
+}
+html[data-theme="dark"]{
+  --bg:#14161a; --panel:#1c1f25; --panel2:#22262d; --ink:#e8e6e1; --ink2:#a3aab6;
+  --line:#333944; --accent:#6fb3dd; --accent2:#8fc9ec; --good:#57c08d; --warn:#e0a24a;
+  --bad:#e8776a; --chip:#2a2f37; --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+@media (prefers-color-scheme: dark){
+  html[data-theme="auto"]{
+    --bg:#14161a; --panel:#1c1f25; --panel2:#22262d; --ink:#e8e6e1; --ink2:#a3aab6;
+    --line:#333944; --accent:#6fb3dd; --accent2:#8fc9ec; --good:#57c08d; --warn:#e0a24a;
+    --bad:#e8776a; --chip:#2a2f37; --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+  font-size:14px; line-height:1.6; overflow-x:hidden;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:14px 16px 60px}
+h1,h2,h3{margin:0 0 8px;line-height:1.35}
+h1{font-size:20px;letter-spacing:.04em}
+h2{font-size:16px}
+h3{font-size:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.panel.sub{background:var(--panel2)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.muted{color:var(--ink2)}
+.small{font-size:12px}
+.tiny{font-size:11px}
+.mono{font-variant-numeric:tabular-nums}
+.good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)} .accent{color:var(--accent)}
+.b{font-weight:700}
+button{
+  font-family:inherit;font-size:13px;padding:6px 12px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+}
+button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover:not(:disabled){filter:brightness(1.1);color:#fff}
+button.danger{border-color:var(--bad);color:var(--bad)}
+button.tiny{font-size:11px;padding:3px 7px}
+input[type=number],input[type=text],select{
+  font-family:inherit;font-size:13px;padding:4px 7px;border-radius:5px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);
+}
+input[type=number]{width:92px;text-align:right;font-variant-numeric:tabular-nums}
+label{cursor:pointer}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;white-space:nowrap}
+th{color:var(--ink2);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto;max-width:100%}
+.chip{display:inline-block;background:var(--chip);border-radius:99px;padding:1px 9px;font-size:11px;margin-right:4px;white-space:nowrap}
+.chip.bad{background:rgba(176,57,47,.15);color:var(--bad)}
+.chip.good{background:rgba(22,121,74,.15);color:var(--good)}
+.chip.warn{background:rgba(176,106,0,.15);color:var(--warn)}
+.bar{height:9px;background:var(--chip);border-radius:99px;overflow:hidden;min-width:140px;flex:1}
+.bar > i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.bar > i.over{background:var(--bad)}
+.bar > i.near{background:var(--warn)}
+.kpi{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline}
+.kpi b{font-size:17px;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.log{max-height:230px;overflow-y:auto;font-size:12.5px;padding-right:4px}
+.log div{padding:3px 0;border-bottom:1px dotted var(--line)}
+.log div:last-child{border-bottom:none}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow-y:auto;z-index:50}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:10px;max-width:760px;width:100%;padding:16px 18px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.modal h2{border-bottom:1px solid var(--line);padding-bottom:8px}
+.opt{border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin-bottom:7px;background:var(--panel2)}
+.opt.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.card{border-left:4px solid var(--accent);background:var(--panel2);border-radius:6px;padding:10px 12px;margin:8px 0}
+.card .t{font-weight:700}
+.card .s{font-size:11px;color:var(--ink2);margin-top:6px;word-break:break-all}
+.locked{opacity:.45}
+.calc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--panel2);border:1px dashed var(--line);border-radius:6px;padding:7px 9px;white-space:pre-wrap;overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.hr{height:1px;background:var(--line);margin:10px 0}
+ul.tight{margin:4px 0;padding-left:20px}
+ul.tight li{margin:2px 0}
+.badge{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px}
+.center{text-align:center}
+.narrow-note{display:none}
+@media(max-width:700px){
+  .narrow-note{display:block;background:var(--chip);color:var(--ink2);font-size:12px;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .wrap{padding:10px 10px 50px}
+  h1{font-size:17px}
+  .kpi{gap:10px}
+  .kpi b{font-size:15px}
+  .modal{padding:12px}
+}
+</style>
+</head>
+<body>
+<div class="narrow-note">この画面はタブレット以上の幅（およそ820px以上）を想定しています。横向きにするか、広い画面で開いてください。表は指で横にスクロールできます。</div>
+<div class="wrap" id="app"></div>
+<div id="modalRoot"></div>
+<script>
+"use strict";
+/* =========================================================================
+   掛売り三年 ―― 設定オブジェクト（docs/design.md §6.9 をそのまま定数表として写す）
+   金額の単位はすべて「万円」。
+   ========================================================================= */
+const CFG = {
+  turns: 36, startYear: 2025, startMonth: 4,
+
+  // §2.3 初期状態
+  init: { cash: 3000, equity: 5000, fixedCost: 590, grossMargin: 0.16, employees: 0 },
+  fixedCostStepTurns: [1, 13, 25], fixedCostStep: 25,   // §2.4 毎年4月に +25万/月
+  employeeCost: 30,                                     // §6.8 従業員1人 +30万/月
+  actionSlotsBase: 3,                                   // §3.2
+  cogsRate: 0.84,                                       // §3.3⑥ 売上×84%
+
+  frameMultiple: 2.0,                                   // §4.4 総与信枠 = 自己資本 × 2.0
+
+  // §4.4 格付
+  ratings: [
+    { key: '最上位', min: 70, pct: 0.20, coef: 0.5, },
+    { key: '上位',   min: 62, pct: 0.14, coef: 0.7, },
+    { key: '中位',   min: 54, pct: 0.08, coef: 1.0, },
+    { key: '下位',   min: 46, pct: 0.04, coef: 1.5, },
+    { key: '要注意', min: -99, pct: 0.02, coef: 2.0, },
+  ],
+  noRating: { key: '格付なし', pct: 0.02, coef: 2.0 },
+
+  // §6.3 保全要求のポイント
+  safeguards: [
+    { key: 'eol',       label: '期限の利益喪失条項', pt: 1, tier: 'light' },
+    { key: 'retention', label: '所有権留保',         pt: 1, tier: 'light' },
+    { key: 'notarial',  label: '公正証書（債務承認弁済契約）', pt: 2, tier: 'heavy' },
+    { key: 'collateral',label: '物的担保',           pt: 3, tier: 'heavy' },
+    { key: 'guarantor', label: '連帯保証人',         pt: 3, tier: 'heavy' },
+  ],
+  // §6.3 対価
+  concessions: [
+    { key: 'discount', label: '売価を1%下げる',     note: '粗利率が1pt下がる' },
+    { key: 'site',     label: '支払サイトを30日延ばす', note: '現金化が1ヶ月遠のく' },
+    { key: 'volume',   label: '取引額を20%減らす',   note: '売上が減る' },
+  ],
+
+  // §6.9(c) 保全状況別の基準回収率
+  baseRecovery: {
+    none:       [0.00, 0.10],
+    eol:        [0.00, 0.15],
+    retention:  [0.30, 0.60],
+    notarial:   [0.50, 0.80],
+    guarantor:  [0.40, 0.90],
+    collateral: [0.70, 0.95],
+  },
+
+  // §6.9(b)
+  transition: {
+    delayToPaid: 0.60, delayToLong: 0.40,
+    longToLegal: 0.25, longToLegalWithPlan: 0.10, longToPaid: 0.15,
+    dunningBonus: 0.15,
+  },
+
+  // §6.9(g) 引合い件数の分布
+  leadDist: [0.15, 0.35, 0.35, 0.15],
+
+  // §7.2 ランダムイベント
+  rnd: { orderDown: 0.03, orderRecover: 0.10, bigOrder: 0.08, spoil: 0.15,
+         costUp: 0.10, termsChange: 0.03, loanOffer: 0.05 },
+
+  // §3.5 機能の段階的開放（この記録が §9.5 の表示制約になる。§11）
+  unlock: { safeguardLight: 5, collection: 6, safeguardHeavy: 8, finance: 12 },
+
+  tax: 0.30,                    // §5.14 実効税率の1行モデル
+  closingTurns: [12, 24, 36],   // 決算
+
+  // 勝敗（§3.4）
+  win: { excellentAmt: 1500, excellentRate: 0.010, goodAmt: 3500, goodRate: 0.025 },
+
+  // アクション費用
+  cost: { registry: 0.4, credit: 4, contentsMail: 0.3, notarial: 5, lawsuit: 80,
+          seizure: 20, repossess: 8, lien: 35, onsite: 0.2 },
+
+  // §6.5 仕入方針
+  purchasePolicies: {
+    order:    { label: '受注仕入',   mult: 1.00, note: '在庫が寝ない。突発の大口注文には応じられない' },
+    standard: { label: '標準',       mult: 1.20, note: 'バランス型' },
+    forecast: { label: '見込み仕入', mult: 1.60, note: '大口に即応できるが売れ残りが現金を食う' },
+  },
+  supplierModes: {
+    normal: { label: '通常の仕入先',            priceMult: 1.00, note: '—' },
+    cross:  { label: '売り先を兼ねる相手から',  priceMult: 1.03, note: '焦げたとき買掛金の範囲を相殺で回収できる（§5.4）' },
+    exempt: { label: '免税事業者から',          priceMult: 1.02, displayMult: 0.92,
+              note: '表示は8%安いが仕入税額控除が取れず実質は約2%高い（§5.13）' },
+  },
+};
+
+/* §6.2 取引先の業種とリスクプロファイル */
+const INDUSTRIES = {
+  retail:    { label:'小売',   min:100, max:300,  delay:0.020, terms:{closing:30,mo:1,day:30,method:'cash',   noteRatio:0,   noteDays:0},
+               lien:'在庫が動くのが速く、先取特権が使いにくい' },
+  food:      { label:'飲食',   min:50,  max:200,  delay:0.050, terms:{closing:30,mo:1,day:20,method:'cash',   noteRatio:0,   noteDays:0},
+               lien:'消費されるので物が残らない' },
+  const:     { label:'建設',   min:300, max:1500, delay:0.030, terms:{closing:30,mo:2,day:30,method:'note',   noteRatio:1.0, noteDays:60},
+               lien:'資材が現場に残る' },
+  mfg:       { label:'製造',   min:200, max:800,  delay:0.015, terms:{closing:20,mo:1,day:30,method:'partial',noteRatio:0.4, noteDays:60},
+               lien:'加工されると先取特権が難しくなる' },
+  ec:        { label:'EC',     min:30,  max:150,  delay:0.040, terms:{closing:30,mo:1,day:30,method:'cash',   noteRatio:0,   noteDays:0},
+               lien:'設立が新しくスコアなしが多い／在庫は追える' },
+  medical:   { label:'医療',   min:30,  max:100,  delay:0.010, terms:{closing:30,mo:1,day:30,method:'cash',   noteRatio:0,   noteDays:0},
+               lien:'公的な収入源が差押えの対象になり、見込みが立つ' },
+};
+
+const NAME_A = ['東和','みどり','城北','湘南','武蔵','常磐','利根','荒川','相模','桜台','浅間','那須','霞ヶ浦','秩父','葛西','平塚'];
+const NAME_B = ['フーズ','食品','商事','物産','商会','マート','デリカ','キッチン','水産','製菓','ストア','マテリアル','工業','建設','デリバリー','ケア'];
+const PREFIX = ['株式会社','有限会社','合同会社'];
+
+/* =========================================================================
+   §8 解説カード 全30枚（必須14／詳細16）
+   ========================================================================= */
+const CARDS = [
+  // ---- 商習慣 7 ----
+  { id:'site-basics', cat:'商習慣', tier:'必須', title:'末締め翌月末払いは60日サイト',
+    body:'支払サイトは (30−締め日) + 支払月の繰り越し×30 + 支払日 で概算する。末締め翌月末払いなら (30−30)+(1×30)+30 = 60日。20日締め翌月10日払いなら (30−20)+(1×30)+10 = 50日。売った日から入金まで、会社は代金を立て替えている。',
+    src:'本ゲームは1ヶ月を30日として概算する実務慣行に従う' },
+  { id:'site-counting', cat:'商習慣', tier:'詳細', title:'サイトの数え方には別解がある',
+    body:'本ゲームは支払サイトを「取引日から入金まで」で数え、末締め翌月末払いを60日とする。一方、実務では「締め日から支払日まで」を数えて同じ条件を30日サイトと呼ぶ用法も広く使われる。手形サイト60日超が指導対象という話（§5.11）と並べると混乱するので、どちらの起点で言っているかを必ず確かめること。',
+    src:'—' },
+  { id:'terms-guard', cat:'商習慣', tier:'必須', title:'締める前には払えない',
+    body:'支払月が当月で、支払日が締め日以前になる組み合わせは成立しない。「末締め・当月末払い」は締め日と支払日が同じ末日なので成立せず、「20日締め・当月10日払い」も締める前に払うことになる。式は無効な組み合わせでも数値を返してしまうので、式より先にガード条件を判定する。',
+    src:'—' },
+  { id:'note-not-cash', cat:'商習慣', tier:'必須', title:'手形は「支払日」に現金化されない',
+    body:'手形は支払日に受け取り、そこからさらに手形サイトの日数が経ってはじめて現金になる。末締め翌月末払い（60日）＋手形サイト60日なら実質120日。売ってから4ヶ月、代金は現金ではない。これが黒字倒産の主要因である。早く現金化したければ割引に出すが、割引料は費用になる。',
+    src:'—' },
+  { id:'note-jump', cat:'商習慣', tier:'詳細', title:'手形ジャンプは最重要の危険信号',
+    body:'「手形の支払期日を延ばしてほしい」という申し出は、資金が回っていないという申告に近い。断れば相手は不渡りを出して倒産しかねず、応じれば回収が遅れて傷が深くなる。応じるなら、追加の担保や連帯保証人と引き換えにするのが定石である。ただし危険信号が出た後の交渉余地はほとんど残っていない。',
+    src:'—' },
+  { id:'note-abolition', cat:'商習慣', tier:'詳細', title:'紙の手形・小切手は2026年度末で利用終了',
+    body:'金融界の自主行動計画により、紙の約束手形・小切手は2026年度末（2027年3月末）を目途に利用を終了し、2027年度初から電子交換所での交換も廃止される。罰則のある義務ではないが、銀行が交換を取り扱わなくなるため実務上は使えなくなる。取引先とは電子記録債権（でんさい）などへの切り替えを事前に交渉しておく必要がある。',
+    src:'全国銀行協会 https://www.zenginkyo.or.jp/tegata-kogitte-haishi/' },
+  { id:'terms-change-signal', cat:'商習慣', tier:'詳細', title:'支払条件の変更要請は危険信号である',
+    body:'「サイトを延ばしてほしい」「手形に変えてほしい」という申し出は、資金繰りが苦しいという申告に近い。給与の遅配、従業員の急な退職、他社からの噂、そして競合が急に撤退したこと（他社が危険を察知した結果かもしれない）も同じ列に並ぶ。応じるなら、以後の遅延確率が上がることを織り込んで限度額を見直すこと。',
+    src:'—' },
+
+  // ---- 与信管理 4 ----
+  { id:'equity-textbook', cat:'与信管理', tier:'必須', title:'教科書の自己資本比を素朴に当てると商売が止まる',
+    body:'格付ごとの上限を自己資本比で決める目安（最上位10%／上位6%／中位4%…）は、自己資本が大きく取引先数も多い企業を前提にしている。自己資本5,000万の中位4%は1社200万。14社に配っても2,800万で、サイト2ヶ月なら月商1,400万しか売れず固定費590万に対し即赤字である。買掛金で仕入を回す卸売業では売掛残高が自己資本を超えるのが普通で、本ゲームは総枠配分モデルで運用する。',
+    src:'—' },
+  { id:'limit-not-monthly', cat:'与信管理', tier:'必須', title:'限度額は残高の上限であって月商の上限ではない',
+    body:'与信限度額は「未回収のまま許す残高の上限」である。月にいくら出荷できるかは 限度額 ÷ 実効サイト（月数）で決まる。限度額700万でも実効サイト3.1ヶ月なら月226万しか出荷できない。実効サイト＝売掛期間＋手形回収割合×手形期間。手形を受けると、同じ枠で売れる量が3割減る。',
+    src:'必要限度 = 月商×売掛期間 + 月商×手形割合×手形期間' },
+  { id:'frame-zero-sum', cat:'与信管理', tier:'詳細', title:'与信枠は有限で、配分はゼロサムである',
+    body:'総与信枠は自己資本の2.0倍。各社の与信限度額の合計がこれを超えることはできない（残高ではなく限度額の合計で管理する）。新規1社を取るには既存のどこかを削るしかない。発注が減った取引先の限度額は自動では下がらないので、「枠の遊び」＝限度額−直近の最大残高を見て剥がす。利益が出て自己資本が増えれば枠も増える。',
+    src:'—' },
+  { id:'share-trap', cat:'与信管理', tier:'詳細', title:'売上シェアが高い相手は切れなくなる',
+    body:'1社への売上シェアが高くなりすぎると、その会社が傾いても取引を縮小できなくなる。縮小すれば相手が潰れ、潰れれば自社の債権が焦げるからである。「支えるために売り続け、しかし入金は遅れる」という悪循環に入る。シェアが高い相手ほど、平時のうちに保全を取っておく価値が大きい。',
+    src:'—' },
+
+  // ---- 債権保全 3 ----
+  { id:'safeguard-timing', cat:'債権保全', tier:'必須', title:'保全は取引開始時にしか取れない',
+    body:'期限の利益喪失条項、所有権留保、公正証書、物的担保、連帯保証人 ―― いずれも相手の協力が要る。危険信号が出た後ではまず応じてもらえない。焦げてからできることは、焦げる前に何をしたかで決まる。交渉余地は「新規交渉時＞取引開始後＞スコア下落後＞遅延後（ゼロ）」と時間とともに縮む。',
+    src:'—' },
+  { id:'notarial-deed', cat:'債権保全', tier:'必須', title:'公正証書があれば裁判を飛ばせる',
+    body:'通常、強制的に回収するには裁判を経て債務名義を得る必要がある。しかし執行力のある公正証書（民事執行法22条5号）があれば、裁判をせずに差押えへ進める。作成には相手の協力が必要なので、取引開始時か、まだ関係が良好なうちにしか取れない。焦げた後に「公正証書を作りませんか」と言っても応じる相手はいない。',
+    src:'民事執行法第22条第5号' },
+  { id:'guaranty-max', cat:'債権保全', tier:'必須', title:'極度額のない個人の根保証は無効',
+    body:'2020年4月施行の民法改正で、個人が根保証（継続的取引から生じる不特定の債務の保証）をする場合、極度額を定めなければ保証契約は無効になった。極度額を空欄のまま連帯保証人を取っても、請求した瞬間に無効と分かるだけである。なお、これは取引先の代表者などから取る人的担保の話で、保証会社の売掛保証サービスとは別物である。',
+    src:'民法第465条の2' },
+
+  // ---- 債権回収 7 ----
+  { id:'dunning-vs-demand', cat:'債権回収', tier:'詳細', title:'督促の電話には記録が残らない',
+    body:'電話や訪問による督促は無料で、相手にまだ払う意思があるうちは有効である。しかし「いつ・誰が・何を請求したか」の記録は残らない。内容証明郵便は費用がかかるが、催告の事実と日付を郵便局が証明するので、時効の完成猶予（民法150条）の根拠になり、期限の利益喪失通知も確実に届く。この差が法務の基礎である。',
+    src:'民法第150条' },
+  { id:'prescription', cat:'債権回収', tier:'必須', title:'催告は延命、承認は更新',
+    body:'債権は権利を行使できると知った時から5年で消滅する（民法166条）。催告をすると、そこから6ヶ月間は時効が完成しない（150条・完成猶予＝延命）。相手が債務を承認すると、時効は振り出しに戻る（152条・更新）。放置した債権は、ある日突然に消える。なお3年のゲーム内で新規債権が5年の時効を迎えることはなく、先代からの債権という形で時間軸を借りている。',
+    src:'民法第166条・第150条・第152条' },
+  { id:'offset', cat:'債権回収', tier:'必須', title:'相殺は自分で作れる',
+    body:'相手に対して買掛金などの債務を持っていれば、売掛金と差し引きできる（民法505条）。相手の同意は不要で、意思表示だけで成立する。相手が破産寸前でも相殺できる範囲は確実に回収できる。ただし破産手続開始後の相殺には制限がある（破産法71条・72条）ので、早く気付くほど有利。危ない売り先からあえて仕入れて割高な代金を払うのは、保険料を払う行為である。',
+    src:'民法第505条／破産法第71条・第72条' },
+  { id:'movables-lien', cat:'債権回収', tier:'必須', title:'納品したものが残っているうちなら追える',
+    body:'自分が売った動産の代金については、その動産から優先して回収できる法定の担保権がある（動産売買先取特権）。契約書に書かなくても当然に発生する。ただし、その動産がまだ相手のところにあり特定できることが要る。転売・加工・混和されると難しく、転売されていれば転売代金債権を差し押さえる形になる。食品は数日で売り切られる。1ターン遅れれば消える。',
+    src:'民法第311条・第321条・第304条' },
+  { id:'seizure', cat:'債権回収', tier:'詳細', title:'差押えには債務名義が要る',
+    body:'差押えを申し立てるには、確定判決・支払督促・執行力のある公正証書などの債務名義が必要である。公正証書を持っていれば即座に進めるが、なければ支払督促や訴訟に数ヶ月かける。その間に相手は他の債権者に資産を持っていかれる。回収は速さの勝負であり、速さは事前準備で買う。',
+    src:'民事執行法' },
+  { id:'bankruptcy-priority', cat:'債権回収', tier:'詳細', title:'破産したら売掛金は最後尾に並ぶ',
+    body:'法的整理に入ると個別の回収は止まり、配当を待つ立場になる。順位はおおむね、担保権者（別除権）→ 財団債権・優先的破産債権（租税、一定範囲の労働債権）→ 一般の破産債権。売掛金は最後の一般債権で、回ってくる財産はほとんど残らないことが多い。破産なら会社は消滅し、民事再生なら債権が大幅に減額されて残りが分割で支払われる。',
+    src:'破産法／民事再生法' },
+  { id:'factoring', cat:'債権回収', tier:'詳細', title:'ファクタリングは借入ではなく債権の売買',
+    body:'買取型ファクタリングは売掛債権を売って早期に現金化する取引で、法的性質は債権譲渡（民法466条・467条）である。債務者に主張するには譲渡人の通知か債務者の承諾、第三者に主張するには確定日付のある証書か債権譲渡登記が要る。手数料10%は粗利率16%の6割超を吹き飛ばす。使うなら、残存サイトが長いうちに動くほど安い。',
+    src:'民法第466条・第467条' },
+
+  // ---- 不正の見抜き方 4 ----
+  { id:'torikomi', cat:'不正の見抜き方', tier:'必須', title:'実績の良さは信用の証明にならない',
+    body:'取り込み詐欺（パクリ屋）は、まず小口の取引を何度もきっちり期日に支払って信用させる。頃合いを見て取引規模を大きくし、あわせて与信限度額の引き上げとサイトの長い決済手段を求めてくる。納品を受けたら代金を払わずに消える。狙われるのは換金性の高い商品 ―― 米や肉などの食品、トナー、PC。食品卸は標的そのものである。',
+    src:'帝国データバンク／Creditsafe の公開解説' },
+  { id:'registry-flags', cat:'不正の見抜き方', tier:'詳細', title:'登記は会社の来歴を隠せない',
+    body:'商号・本店・事業目的・役員・設立年月日は商業登記として公開され、変更の履歴も残る。相互に関係のない事業目的が多数並ぶ、本店が短期間に何度も移転している、商号の変更歴がある、役員が最近まとめて入れ替わっている、設立は古いのに商号と事業が噛み合わない ―― これらは休眠会社の買収の痕跡である。数千円で、相手の来歴が分かる。',
+    src:'会社法・商業登記法（登記事項証明書）' },
+  { id:'circular', cat:'不正の見抜き方', tier:'必須', title:'伝票だけが回る取引がある',
+    body:'架空循環取引では、複数の会社が物のやり取りをしないまま形式上の売買を繰り返して売上を膨らませる。卸売業は「伝票を通すだけで口銭が入る」と誘われて第三者として組み込まれやすく、手形払いなどの金融機能を担わされ、最後に不良債権が残る。確かめるべきは、商品が実際に動いているか、自社が介在する経済合理性があるか、の2点である。',
+    src:'公表事例: 水産物卸の循環取引（2023年発覚）' },
+  { id:'illegal-liability', cat:'不正の見抜き方', tier:'詳細', title:'知らずに巻き込まれても売掛金は自社が負う',
+    body:'架空の売上を計上する行為は粉飾決算の一種で、上場会社なら開示書類の虚偽記載として金融商品取引法違反にあたる。加担すれば詐欺（刑法246条）や共同不法行為の責任を問われうる。反社会的勢力との関係が判明した相手とは、財務内容がどれほど良好でも取引できない。罪名を覚えるより、これらの類型では回収手段が一切効かないことを覚えるほうが実務的である。',
+    src:'刑法第246条／金融商品取引法' },
+
+  // ---- 在庫と仕入 2 ----
+  { id:'inventory-is-cash', cat:'在庫と仕入', tier:'詳細', title:'在庫は現金が形を変えたものである',
+    body:'仕入れた瞬間に現金は在庫に変わり、売れて回収できるまで現金には戻らない。見込み仕入は突発の大口注文に即応できるが、売れ残りは現金を食い、食品なら賞味期限で廃棄になる。仕入価格が高騰した局面で見込み仕入をしていると、高値の在庫を抱えることになる。損益計算書が黒字でも、現金が尽きれば倒産する。',
+    src:'—' },
+  { id:'supplier-choice', cat:'在庫と仕入', tier:'詳細', title:'「安い」の意味を確かめる',
+    body:'免税事業者から仕入れると表示価格は安いが、適格請求書がないため仕入税額控除が取れず、その分を自社が負担する。実質は割高になることがある。逆に、売り先を兼ねる相手から3%高く仕入れるのは、焦げたときに買掛金の範囲を相殺で確実に回収するための保険料である。仕入先の選択は、回収手段の選択でもある。',
+    src:'消費税法（適格請求書等保存方式）' },
+
+  // ---- 法令 2 ----
+  { id:'toriteki', cat:'法令', tier:'必須', title:'取適法が効く取引と効かない取引が同じ会社の中にある',
+    body:'2026年1月1日、下請法は中小受託取引適正化法（取適法）になった。手形払いの禁止、従業員数基準の導入、そして特定運送委託（発荷主が運送事業者に委託する運送）の追加。対象は製造委託・修理委託・情報成果物作成委託・役務提供委託・特定運送委託であって、単純な物品の売買は含まれない。配送を外注する自社は発荷主として守る義務を負うが、通常の卸売の販売先からは相変わらず手形で払われる。',
+    src:'公正取引委員会 https://www.jftc.go.jp/file/toriteki_leaflet.pdf' },
+  { id:'sixty-days', cat:'法令', tier:'詳細', title:'60日ルールの起算点は取引の種類で変わる',
+    body:'取適法では受領日から60日以内に代金を支払う義務があり、違反すると年14.6%の遅延利息が発生する。起算点は、物品の製造委託などでは「物品等を受領した日」、役務提供委託（配送の委託を含む）では「役務の提供を受けた日」である。また2024年11月1日から、サイトが60日を超える手形は割引困難な手形として行政指導の対象になった。短縮の交渉には法的な裏付けがある。',
+    src:'取適法第2条の2・第4条の2／2024年11月の運用変更' },
+
+  // ---- 会計 1 ----
+  { id:'bad-debt-tax', cat:'会計', tier:'詳細', title:'貸倒損失の計上は「諦める」という判断でもある',
+    body:'回収不能が確定した売掛金は貸倒損失として損金に計上でき、その分だけ納税額が減って現金が残る。ただし計上は回収を諦める意思表示でもあり、いつ「回収不能」と判断したかの記録が根拠になる。後で回収できれば益金として課税される。本ゲームは実効税率30%の1行モデルで、納税額 = max(0, 営業利益 − 貸倒計上額) × 30%。欠損金の繰越は扱わない。',
+    src:'法人税基本通達 9-6-1〜9-6-3' },
+];
+const CARD_CATS = ['商習慣','与信管理','債権保全','債権回収','不正の見抜き方','在庫と仕入','法令','会計'];
+
+/* =========================================================================
+   汎用ユーティリティ
+   ========================================================================= */
+let S = null;                       // ゲーム状態（1スロット）
+let rngState = 1;
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+let RNG = mulberry32(1);
+function rnd(){ S.rngCount = (S.rngCount||0)+1; return RNG(); }
+function ri(a,b){ return a + Math.floor(rnd()*(b-a+1)); }
+function pick(arr){ return arr[Math.floor(rnd()*arr.length)]; }
+function chance(p){ return rnd() < p; }
+function rrange(pair){ return pair[0] + rnd()*(pair[1]-pair[0]); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+function round0(v){ return Math.round(v); }
+
+function fmt(v){ return Math.round(v).toLocaleString('ja-JP'); }
+function man(v){ return fmt(v) + '万円'; }
+function pct(v,d){ return (v*100).toFixed(d===undefined?1:d) + '%'; }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function ym(turn){
+  const m0 = (CFG.startMonth - 1) + (turn - 1);
+  return (CFG.startYear + Math.floor(m0/12)) + '年' + (m0%12 + 1) + '月';
+}
+
+/* =========================================================================
+   §4.1 支払サイト（ガード条件を式より先に判定する）
+   ========================================================================= */
+function termsValid(t){
+  if (t.mo === 0 && t.day <= t.closing) return false;   // 締める前には払えない
+  return true;
+}
+function siteDays(t){
+  if (!termsValid(t)) return null;
+  if (t.mo === 0) return t.day - t.closing;
+  return (30 - t.closing) + t.mo*30 + t.day;
+}
+function siteFormula(t){
+  if (t.mo === 0) return `${t.day} − ${t.closing} = ${siteDays(t)}日`;
+  return `(30−${t.closing}) + (${t.mo}×30) + ${t.day} = ${siteDays(t)}日`;
+}
+function termsLabel(t){
+  const c = t.closing === 30 ? '末' : t.closing + '日';
+  const m = ['当月','翌月','翌々月','3ヶ月後','4ヶ月後'][t.mo] || (t.mo + 'ヶ月後');
+  const d = t.day === 30 ? '末' : t.day + '日';
+  const method = { cash:'現金', note:'手形', partial:'一部手形' }[t.method];
+  return `${c}締め ${m}${d}払い／${method}` + (t.method!=='cash' ? `（手形サイト${t.noteDays}日）` : '');
+}
+/** 売掛期間（月） */
+function arMonths(t){ return siteDays(t) / 30; }
+/** §6.4 実効サイト（月）＝ 売掛期間 + 手形回収割合 × 手形期間 */
+function effectiveMonths(t){ return arMonths(t) + (t.noteRatio||0) * ((t.noteDays||0)/30); }
+/** 売掛金の入金ターン（1ヶ月＝30日で丸める） */
+function dueOffset(t){ return Math.max(1, Math.round(siteDays(t)/30)); }
+function noteOffset(t){ return Math.max(1, Math.round((t.noteDays||0)/30)); }
+
+/* =========================================================================
+   §4.4 格付・与信枠
+   ========================================================================= */
+function ratingOf(co){
+  if (co.score === null || co.score === undefined) return CFG.noRating;
+  for (const r of CFG.ratings) if (co.score >= r.min) return r;
+  return CFG.ratings[CFG.ratings.length-1];
+}
+function totalFrame(){ return Math.round(S.equity * CFG.frameMultiple); }
+function frameUsed(){ return S.companies.filter(c=>c.active).reduce((a,c)=>a+c.limit, 0); }
+function frameFree(){ return totalFrame() - frameUsed(); }
+function perCompanyCap(co){ return Math.round(totalFrame() * ratingOf(co).pct); }
+/** 必要限度（§4.4） */
+function requiredLimit(co){
+  const t = co.terms;
+  return co.order * arMonths(t) + co.order * (t.noteRatio||0) * ((t.noteDays||0)/30);
+}
+function outstanding(co){
+  return S.receivables.filter(r=>r.coId===co.id && !r.settled).reduce((a,r)=>a+r.amount,0);
+}
+function overdueAmount(co){
+  return S.receivables.filter(r=>r.coId===co.id && !r.settled && r.dueTurn <= S.turn && r.kind==='ar').reduce((a,r)=>a+r.amount,0);
+}
+/** §9.2 枠の遊び = 限度額 − 直近3ヶ月の最大残高 */
+function frameSlack(co){
+  const peak = Math.max(outstanding(co), ...(co.balHistory||[0]).slice(-3));
+  return Math.max(0, co.limit - peak);
+}
+/** §6.4 月次の出荷可能額 */
+function shippableCash(co, limit){ return limit / arMonths(co.terms); }
+function shippableReal(co, limit){ return limit / effectiveMonths(co.terms); }
+
+/* =========================================================================
+   会社レコード
+   ========================================================================= */
+let _cid = 0;
+function makeCompany(o){
+  const ind = INDUSTRIES[o.industry];
+  const co = {
+    id: ++_cid,
+    name: o.name,
+    industry: o.industry,
+    order: o.order,                     // 月あたりの取引額
+    baseOrder: o.order,
+    terms: JSON.parse(JSON.stringify(o.terms || ind.terms)),
+    score: (o.score === undefined) ? null : o.score,
+    disclosed: o.score !== null && o.score !== undefined,
+    limit: o.limit || 0,
+    priceIdx: 1.0,                      // §6.9(h) 取引先ごとの粗利率はここから計算する
+    room: o.room,                       // §6.3 交渉余地（隠しパラメータ）
+    roomLower: null, roomRange: null,   // 調査で分かる範囲
+    safeguards: {},                     // key -> {turn, pt}
+    guarantorCap: null,
+    isSupplier: false, apBalance: 0,
+    status: 'normal',                   // normal / delay / longdelay / legal / closed
+    delayTurns: 0, legalTurn: null, resolveTurn: null,
+    termsChanged: false,
+    recoveryBonus: 0, actionsTaken: {}, actionTurns: {},
+    stock: null,                        // 納品物 {amount, resaleTurn}
+    trap: o.trap || null,               // 'fraud' | 'circular' | 'antisocial' | 'note' | null
+    suspicious: !!o.suspicious,         // 「怪しいが本物」
+    registryChecked: false, creditChecked: false,
+    active: true, startTurn: S ? S.turn : 1,
+    balHistory: [], noPaperNote: false, jumpCount: 0,
+    scoreCleanTurns: 0, note: o.note || '',
+  };
+  return co;
+}
+function randName(){
+  for (let i=0;i<40;i++){
+    const n = pick(PREFIX) + pick(NAME_A) + pick(NAME_B);
+    if (!S.companies.some(c=>c.name===n) && !S.leads.some(c=>c.name===n)) return n;
+  }
+  return pick(PREFIX) + pick(NAME_A) + pick(NAME_B) + ri(2,99);
+}
+/** §6.9(e) 交渉余地の初期値 */
+function initialRoom(score){
+  if (score === null) return ri(2,3);
+  if (score >= 62) return ri(1,2);
+  if (score >= 46) return 2;
+  return ri(2,3);
+}
+/** 現在の交渉余地（§6.3 余地は時間とともに縮む） */
+function currentRoom(co, atContract){
+  if (co.status === 'delay' || co.status === 'longdelay' || co.status === 'legal') return 0;
+  let r = atContract ? co.room : co.room - 1;
+  if (co.scoreDropped) r = Math.min(r, 1);
+  r -= (S.reputationPenalty || 0);
+  return Math.max(0, r);
+}
+
+/* =========================================================================
+   初期状態（§2.3 初期6社）
+   ========================================================================= */
+const INITIAL_COMPANIES = [
+  { name:'株式会社東部フード', industry:'retail', order:1400, score:67, limit:2800, room:1, ar:2800, main:true },
+  { name:'北関東製菓株式会社', industry:'mfg',    order:520,  score:71, limit:1200, room:1, ar:1040,
+    terms:{closing:20,mo:1,day:30,method:'cash',noteRatio:0,noteDays:0} },
+  { name:'株式会社城南商会',   industry:'retail', order:520,  score:72, limit:1200, room:1, ar:1040 },
+  { name:'みなと水産株式会社', industry:'retail', order:520,  score:65, limit:1200, room:2, ar:1040 },
+  { name:'山手フーズ株式会社', industry:'food',   order:520,  score:63, limit:1200, room:2, ar:1040 },
+  { name:'三葉フーズ株式会社', industry:'retail', order:520,  score:64, limit:1200, room:2, ar:1040 },
+];
+
+function newGame(seed){
+  _cid = 0;
+  seed = seed || (Date.now() % 1000000);
+  RNG = mulberry32(seed);
+  S = {
+    seed, rngCount:0, turn:1, phase:'play',
+    cash: CFG.init.cash, equity: CFG.init.equity, fixedCost: CFG.init.fixedCost,
+    employees: 0, inventory: 0, costIdx: 1.0,
+    purchasePolicy:'standard', supplierMode:'normal',
+    companies:[], leads:[], receivables:[], payables:[], loans:[],
+    slotsUsed:0, log:[], cards:{}, newCards:[],
+    pending:[],                       // 対応が必要な案件（イベント由来）
+    yearOp:0, yearBadDebtWriteOff:0, yearSales:0,
+    stats:{ sales:0, badDebtNet:0, badDebtGross:0, recovered:0, refused:0, refusedCount:0,
+            avoidedLoss:0, refusedHealthy:0, safeguardsTaken:0, safeguardMissed:0,
+            frameUseSum:0, frameUseCnt:0, actionsUsed:{}, cardsAt:{} },
+    flags:{ toriteki:false, paperNoteEnd:false, legacySafe:false, legacyResolved:false },
+    unlockedAt:{},                    // §11 機能の開放ターンの記録
+    history:[], resolutions:[], ending:null, gameOver:null,
+    reputationPenalty:0, legacy:{ amount:430, deadline:14, alive:true },
+    surveys:[],                       // §6.3 調査は翌ターンに結果が出る
+    trapPlan:[], eventsDone:{}, lastReport:null, cardQueue:[],
+  };
+  // 初期6社（§2.3）
+  for (const d of INITIAL_COMPANIES){
+    const co = makeCompany(d);
+    co.limit = d.limit; co.main = !!d.main; co.startTurn = 0;
+    S.companies.push(co);
+    // 期首の売掛残高（月商×2ヶ月相当）を、直近2ヶ月に発生したものとして積む
+    const off = dueOffset(co.terms);
+    const half = d.ar/2;
+    S.receivables.push({ id:'i'+co.id+'a', coId:co.id, amount:half, kind:'ar', dueTurn:1, born:-1, settled:false });
+    S.receivables.push({ id:'i'+co.id+'b', coId:co.id, amount:d.ar-half, kind:'ar', dueTurn:1+Math.max(1,off-1), born:0, settled:false });
+  }
+  // 期首の買掛（前月仕入分）
+  S.payables.push({ turn:1, amount: Math.round(4000*CFG.cogsRate) });
+  planTraps();
+  log('あなたは株式会社カケウリ商事の二代目社長に就任した。36ヶ月で会社を潰さず、焦げ付きを出さないことが目標である。','info');
+  fireFixedEvents();
+  generateLeads();
+  return S;
+}
+
+function log(text, kind){
+  S.log.unshift({ turn:S.turn, text, kind: kind||'' });
+  if (S.log.length > 400) S.log.pop();
+}
+
+/* =========================================================================
+   §7.3 罠プールと抽選
+   ========================================================================= */
+function planTraps(){
+  const pool = ['fraud','circular','antisocial','notedrawer'];
+  // 2〜3種を抽選
+  const n = ri(2,3);
+  const chosen = [];
+  const p = pool.slice();
+  for (let i=0;i<n;i++) chosen.push(p.splice(Math.floor(rnd()*p.length),1)[0]);
+  const windows = { fraud:{intro:7, main:21}, circular:{intro:13, main:13},
+                    antisocial:{intro:11, main:11}, notedrawer:{intro:17, main:22} };
+  S.trapPlan = chosen.map(k=>({
+    kind:k,
+    introTurn: clamp(windows[k].intro + ri(-4,4), 2, 30),
+    mainTurn:  clamp(windows[k].main  + ri(-4,4), 6, 32),
+    done:false, introduced:false, coId:null, taken:false,
+  }));
+  S.trapPlan.forEach(t=>{ if (t.mainTurn <= t.introTurn) t.mainTurn = t.introTurn + ri(4,8); });
+}
+
+/* =========================================================================
+   §8 解説カード
+   ========================================================================= */
+function giveCard(id){
+  if (S.cards[id]) return;
+  const c = CARDS.find(x=>x.id===id);
+  if (!c) return;
+  S.cards[id] = S.turn;
+  S.stats.cardsAt[id] = S.turn;
+  if (c.tier === '必須') S.cardQueue.push(id);
+  else log('用語帳に追加: 「' + c.title + '」', 'card');
+}
+function cardCount(){ return Object.keys(S.cards).length; }
+
+/* =========================================================================
+   §3.3① 引合いフェーズ
+   ========================================================================= */
+function leadCount(){
+  const shift = S.employees;            // §6.9(g) 従業員1人で期待値+0.5社
+  let r = rnd(), acc = 0, n = 0;
+  for (let i=0;i<CFG.leadDist.length;i++){ acc += CFG.leadDist[i]; if (r < acc){ n = i; break; } }
+  if (shift > 0 && chance(Math.min(0.9, shift*0.5))) n += 1;
+  return Math.min(3, n);
+}
+function generateLeads(){
+  S.leads = [];
+  const n = leadCount();
+  for (let i=0;i<n;i++) S.leads.push(makeLead());
+  // 「怪しいが本物」を毎回1〜2社混ぜる（§7.3）
+  if (S.leads.length && chance(0.25)) { S.leads[0].suspicious = true; S.leads[0].registryFlags = registryFlagText(true); }
+}
+function makeLead(opt){
+  opt = opt || {};
+  const key = opt.industry || pick(Object.keys(INDUSTRIES));
+  const ind = INDUSTRIES[key];
+  const order = opt.order || ri(ind.min, ind.max);
+  // §4.6 約3割は決算書を出さない → スコアなし
+  const noScore = opt.score === null ? true : (opt.score === undefined ? chance(key==='ec'?0.5:0.3) : false);
+  const score = opt.score !== undefined ? opt.score : (noScore ? null : ri(38,75));
+  const co = makeCompany({
+    name: opt.name || randName(), industry:key, order,
+    terms: opt.terms || JSON.parse(JSON.stringify(ind.terms)),
+    score, room: opt.room !== undefined ? opt.room : initialRoom(score),
+    trap: opt.trap || null, note: opt.note || '',
+  });
+  co.isLead = true;
+  co.registryFlags = registryFlagText(!!opt.trap || !!opt.suspicious);
+  co.suspicious = !!opt.suspicious;
+  co.creditNote = opt.creditNote || '';
+  return co;
+}
+function registryFlagText(flagged){
+  if (!flagged) return ['事業目的は食品関連に整合','本店の移転歴なし','役員の変更は直近3年なし'];
+  return pick([
+    ['事業目的に相互に無関係な事業が9件並ぶ','本店が2年で3回移転している','役員が昨年まとめて入れ替わっている'],
+    ['設立は1998年だが商号を2年前に変更','本店移転が直近で2回','事業目的に「金融業」「古物商」など雑多な記載'],
+  ]);
+}
+
+/* =========================================================================
+   §3.5 機能の段階的開放（開放ターンを記録する。§11 の実装制約）
+   ========================================================================= */
+function unlocked(key){ return S.turn >= CFG.unlock[key]; }
+function unlockTurn(key){ return CFG.unlock[key]; }
+function safeguardAvailable(sg, turn){
+  const t = (turn === undefined) ? S.turn : turn;
+  return t >= (sg.tier === 'light' ? CFG.unlock.safeguardLight : CFG.unlock.safeguardHeavy);
+}
+
+/* =========================================================================
+   ③ 出荷・売上計上フェーズ
+   ========================================================================= */
+const STOCK_LIFE = { retail:1, food:1, const:3, mfg:2, ec:2, medical:1 };
+
+function marginOf(co){ return 1 - (CFG.cogsRate * S.costIdx / co.priceIdx); }
+
+function phaseShip(rep){
+  for (const co of S.companies){
+    if (!co.active || co.status !== 'normal') continue;
+    const head = Math.max(0, co.limit - outstanding(co));
+    const ship = Math.min(co.order, head);
+    co.balHistory.push(outstanding(co));
+    if (co.balHistory.length > 6) co.balHistory.shift();
+    if (ship <= 0.5){
+      if (co.order > 0 && head < co.order) rep.blocked.push({ name:co.name, lost: co.order - Math.max(0,head) });
+      continue;
+    }
+    if (ship < co.order - 0.5) rep.blocked.push({ name:co.name, lost: co.order - ship });
+    const rev = ship;
+    S.receivables.push({ id:'r'+(S.receivables.length+1), coId:co.id, amount:rev, kind:'ar',
+                         dueTurn: S.turn + dueOffset(co.terms), born:S.turn, settled:false });
+    co.stock = { amount: rev, deliveredTurn: S.turn, resaleTurn: S.turn + (STOCK_LIFE[co.industry]||1) };
+    rep.sales += rev;
+    const mg = marginOf(co);
+    rep.gross += rev * mg;
+    rep.cogs  += rev * (1 - mg);      // 実際に支払う仕入原価。価格転嫁の成否がそのまま現金に効く
+  }
+  S.stats.sales += rep.sales;
+  S.yearSales += rep.sales;
+}
+
+/* =========================================================================
+   ④ 入金フェーズ ＋ §6.9(a) 遅延の発生
+   ========================================================================= */
+function delayProb(co){
+  if (co.neverDelay) return 0;          // §4.9 助走期間は一度も遅延しない
+  const ind = INDUSTRIES[co.industry];
+  return ind.delay * ratingOf(co).coef * (co.termsChanged ? 1.5 : 1);
+}
+function settleAR(co, r, rep){
+  r.settled = true;
+  const nr = (S.flags.paperNoteEnd && !co.keepsNote) ? 0 : (co.terms.noteRatio || 0);
+  const cashPart = r.amount * (1 - nr);
+  S.cash += cashPart; rep.cashIn += cashPart;
+  if (nr > 0){
+    const amt = r.amount * nr;
+    S.receivables.push({ id:r.id+'n', coId:co.id, amount:amt, kind:'note', dueTurn:S.turn,
+                         cashTurn: S.turn + noteOffset(co.terms), born:r.born, settled:false });
+    rep.notes += amt;
+  }
+}
+function phaseCollect(rep){
+  for (const co of S.companies){
+    if (!co.active) continue;
+    const dues = S.receivables.filter(r=>r.coId===co.id && !r.settled && r.kind==='ar' && r.dueTurn <= S.turn);
+    if (co.status === 'normal'){
+      if (dues.length){
+        if (chance(delayProb(co))){
+          enterDelay(co, rep);
+        } else {
+          dues.forEach(r=>settleAR(co, r, rep));
+          co.scoreCleanTurns++;
+          if (co.scoreCleanTurns === 24 && co.score !== null){ co.score = Math.min(75, co.score+3); log(co.name+': 24ヶ月間 遅延なく取引を継続。信用スコアが +3 された。','good'); }
+        }
+      }
+      // 手形の期日到来
+      for (const r of S.receivables){
+        if (r.coId===co.id && !r.settled && r.kind==='note' && r.cashTurn <= S.turn){
+          r.settled = true; S.cash += r.amount; rep.cashIn += r.amount; rep.notesCashed += r.amount;
+        }
+      }
+    }
+  }
+}
+function enterDelay(co, rep){
+  co.status = 'delay'; co.delayTurns = 1;
+  if (co.score !== null) co.score = Math.max(0, co.score - 5);   // §6.9(d)
+  log('⚠ ' + co.name + ' が支払期日に入金しなかった（遅延）。売掛 ' + man(outstanding(co)) + '。交渉余地は0になった。','bad');
+  if (rep) rep.newDelays.push(co.name);
+  giveCard('dunning-vs-demand');
+}
+
+/* =========================================================================
+   §6.9(b) 遅延 → 長期遅延 → 法的整理（各ターン開始時に判定）
+   ========================================================================= */
+function phaseTransitions(){
+  for (const co of S.companies){
+    if (!co.active) continue;
+    const T = CFG.transition;
+    if (co.status === 'delay'){
+      const bonus = (co.actionsTaken.dun || co.actionsTaken.mail) ? T.dunningBonus : 0;
+      if (chance(T.delayToPaid + bonus)){
+        payoffAll(co, '遅延が解消し、滞留していた売掛金が入金された');
+      } else {
+        co.status = 'longdelay'; co.delayTurns = 2;
+        if (co.score !== null) co.score = Math.max(0, co.score - 12);
+        log('⚠⚠ ' + co.name + ' が長期遅延に移行した。先取特権と相殺は時間との勝負になる。','bad');
+        giveCard('movables-lien');
+      }
+    } else if (co.status === 'longdelay'){
+      co.delayTurns++;
+      const legalP = co.actionsTaken.plan ? T.longToLegalWithPlan : T.longToLegal;
+      const payBonus = (co.actionsTaken.mail || co.actionsTaken.seizure) ? T.dunningBonus : 0;
+      if (chance(legalP)) enterLegal(co, null);
+      else if (chance(T.longToPaid + payBonus)) payoffAll(co, '長期遅延だったが、回収圧力が効いて全額が入金された');
+    }
+  }
+}
+function payoffAll(co, msg){
+  let sum = 0;
+  for (const r of S.receivables){
+    if (r.coId===co.id && !r.settled){ r.settled = true; sum += r.amount; }
+  }
+  S.cash += sum;
+  co.status = 'normal'; co.delayTurns = 0; co.actionsTaken = {};
+  log('✔ ' + co.name + ': ' + msg + '（' + man(sum) + '）','good');
+  S.pending = S.pending.filter(p=>p.coId !== co.id);
+}
+function enterLegal(co, forcedKind){
+  const amt = outstanding(co);
+  co.status = 'legal'; co.legalTurn = S.turn; co.resolveTurn = S.turn + 2;
+  co.legalKind = forcedKind || (chance(0.70) ? '破産' : '民事再生');   // §5.8
+  co.claim = amt;
+  log('■ ' + co.name + ' が' + (co.legalKind==='破産'?'破産手続':'民事再生手続') +
+      'に入った。個別の回収は止まり、売掛 ' + man(amt) + ' は配当を待つ立場になる。あと2ターンで結末が確定する。','bad');
+  giveCard('bankruptcy-priority');
+  S.pending.push({ coId:co.id, kind:'legal', text:'法的整理（配当確定まで2ターン）' });
+}
+
+/* =========================================================================
+   §6.9(c) 回収の確定
+   ========================================================================= */
+function bestBase(co){
+  // 相殺を先に確定 → 残額に対し、保全のうち最も高い基準回収率だけを適用（max。加算しない）
+  const cand = [];
+  if (co.trap === 'fraud' || co.trap === 'circular') return { key:'trap', rate:0, label:'この類型では回収手段が効かない' };
+  cand.push({ key:'none', rate: rrange(CFG.baseRecovery.none), label:'保全なし' });
+  if (co.safeguards.eol)       cand.push({ key:'eol', rate: rrange(CFG.baseRecovery.eol), label:'期限の利益喪失条項' });
+  if (co.safeguards.retention) cand.push({ key:'retention', rate: rrange(CFG.baseRecovery.retention), label:'所有権留保' });
+  if (co.safeguards.notarial)  cand.push({ key:'notarial', rate: rrange(CFG.baseRecovery.notarial), label:'公正証書（執行力あり）' });
+  if (co.safeguards.guarantor && co.actionsTaken.claimGuarantor){
+    if (co.guarantorCap && co.guarantorCap > 0) cand.push({ key:'guarantor', rate: rrange(CFG.baseRecovery.guarantor), label:'連帯保証人', cap: co.guarantorCap });
+    else cand.push({ key:'guarantorVoid', rate:0, label:'連帯保証人（極度額の定めがなく無効）' });
+  }
+  if (co.safeguards.collateral && co.actionsTaken.enforceCollateral)
+    cand.push({ key:'collateral', rate: rrange(CFG.baseRecovery.collateral), label:'物的担保' });
+  cand.sort((a,b)=>b.rate-a.rate);
+  return cand[0];
+}
+function resolveClaim(co){
+  const total = co.claim;
+  let recovered = 0;
+  const lines = [];
+  // 1) 相殺（買掛金の額まで100%）
+  let offsetAmt = 0;
+  if (co.actionsTaken.offset && co.isSupplier && co.apBalance > 0){
+    offsetAmt = Math.min(total, co.apBalance);
+    recovered += offsetAmt;
+    lines.push('相殺で ' + man(offsetAmt) + ' を確保（買掛金の範囲は100%）');
+  }
+  const rest = total - offsetAmt;
+  // 2) 基準回収率（最も高いもの1つだけ）
+  const base = bestBase(co);
+  let rate = base.rate;
+  // 3) §6.7 のボーナスを加算し 100% でクリップ
+  const bonus = co.recoveryBonus || 0;
+  rate = clamp(rate + bonus, 0, 1);
+  let got = rest * rate;
+  if (base.cap) got = Math.min(got, base.cap);
+  recovered += got;
+  lines.push('基準回収率 ' + pct(base.rate,0) + '（' + base.label + '）＋ 回収アクション ' + pct(bonus,0) +
+             ' → ' + pct(rate,0) + ' で ' + man(got));
+  if (base.cap) lines.push('連帯保証人の極度額 ' + man(base.cap) + ' でキャップ');
+  if (co.legalKind === '民事再生') lines.push('民事再生のため、残額は再生計画に従って大幅に減額された');
+
+  const loss = total - recovered;
+  S.cash += recovered;
+  S.equity -= loss;                      // §6.9(f) 焦げ付きは確定時に自己資本から直接減らす
+  S.stats.recovered += recovered;
+  S.stats.badDebtGross += total;
+  S.stats.badDebtNet += loss;
+  S.receivables.forEach(r=>{ if (r.coId===co.id) r.settled = true; });
+  co.status = 'closed'; co.active = false; co.order = 0;
+  co.writeOffPending = loss;             // §5.14 貸倒計上の判断材料
+  S.resolutions.push({ name:co.name, total, recovered, loss, base:base.label, bonus,
+                       safeguards:Object.keys(co.safeguards), turn:S.turn, trap:co.trap });
+  S.pending = S.pending.filter(p=>p.coId !== co.id);
+  log('【確定】' + co.name + '：債権 ' + man(total) + ' のうち ' + man(recovered) + ' を回収、' +
+      man(loss) + ' が焦げ付いた。' + lines.join(' / '), loss > recovered ? 'bad':'good');
+  if (co.trap === 'fraud' || co.trap === 'circular') giveCard(co.trap==='fraud'?'torikomi':'circular');
+  if (Object.keys(co.safeguards).length === 0) giveCard('safeguard-timing');
+  return { recovered, loss, lines };
+}
+function resolveDueClaims(){
+  for (const co of S.companies){
+    if (co.status === 'legal' && S.turn >= co.resolveTurn) resolveClaim(co);
+  }
+}
+
+/* =========================================================================
+   ⑥ 月次コストフェーズ
+   ========================================================================= */
+function expectedSales(){
+  return S.companies.filter(c=>c.active && c.status==='normal')
+                    .reduce((a,c)=>a + (c.prepay ? c.order : Math.min(c.order, c.limit/effectiveMonths(c.terms))), 0);
+}
+function expectedCogs(){
+  return S.companies.filter(c=>c.active && c.status==='normal')
+                    .reduce((a,c)=>{ const v = c.prepay ? c.order : Math.min(c.order, c.limit/effectiveMonths(c.terms));
+                                     return a + v * (1 - marginOf(c)); }, 0);
+}
+function phaseCosts(rep){
+  // 仕入（前月発注分の支払）
+  const dues = S.payables.filter(p=>p.turn <= S.turn);
+  const buy = dues.reduce((a,p)=>a+p.amount,0);
+  S.payables = S.payables.filter(p=>p.turn > S.turn);
+  S.cash -= buy; rep.buy = buy;
+
+  // 当月の発注（支払は翌月末）
+  const pol = CFG.purchasePolicies[S.purchasePolicy];
+  const sup = CFG.supplierModes[S.supplierMode];
+  const cogs = rep.cogs;
+  const target = expectedCogs() * (pol.mult - 1);
+  const orderAmt = Math.max(0, cogs + (target - S.inventory)) * sup.priceMult;
+  S.payables.push({ turn:S.turn+1, amount: orderAmt });
+  S.inventory = Math.max(0, S.inventory + orderAmt/sup.priceMult - cogs);
+  rep.purchaseOrder = orderAmt;
+  // 相殺の盾: 売り先を兼ねる仕入先には買掛金が立つ
+  if (S.supplierMode === 'cross'){
+    const targets = S.companies.filter(c=>c.active && c.isSupplier);
+    if (targets.length){
+      const each = orderAmt / targets.length;
+      targets.forEach(c=>{ c.apBalance = Math.min(c.limit, (c.apBalance||0)*0.6 + each); });
+    }
+  } else {
+    S.companies.forEach(c=>{ if (c.apBalance) c.apBalance *= 0.6; });
+  }
+
+  const fixed = S.fixedCost + S.employees * CFG.employeeCost;
+  S.cash -= fixed; rep.fixed = fixed;
+  S.cash -= rep.expense;
+  // 借入の返済
+  let loanPay = 0;
+  for (const l of S.loans){
+    if (l.left <= 0) continue;
+    const interest = l.left * l.rate/12;
+    const principal = Math.min(l.left, l.monthly);
+    loanPay += interest + principal; l.left -= principal;
+  }
+  S.loans = S.loans.filter(l=>l.left > 0.5);
+  S.cash -= loanPay; rep.loanPay = loanPay;
+
+  rep.op = rep.gross - fixed - rep.expense - loanPay;   // 営業利益（焦げ付きは含めない。§6.9(f)）
+  S.yearOp += rep.op;
+  S.equity += rep.op;
+  rep.cashOut = buy + fixed + rep.expense + loanPay;
+
+  if (S.cash < 0){
+    S.gameOver = { turn:S.turn, kind: (S.yearOp >= 0 ? '黒字倒産' : '赤字倒産'), cash:S.cash };
+    log('★ 現金が ' + man(S.cash) + ' となり、支払いができなくなった。' + S.gameOver.kind + 'である。','bad');
+  }
+}
+
+/* =========================================================================
+   ターン進行
+   ========================================================================= */
+function endTurn(){
+  if (S.gameOver || S.ending) return;
+  const rep = { turn:S.turn, sales:0, gross:0, cogs:0, cashIn:0, cashOut:0, notes:0, notesCashed:0,
+                expense: S.turnExpense || 0, buy:0, fixed:0, loanPay:0, op:0,
+                blocked:[], newDelays:[], events:[] };
+  // 当月の入金を確認してから、その月の出荷を行う（§3.3③④。限度額 ÷ 実効サイト ＝ 月次出荷可能額 が
+  // 正しく成り立つのは、期日到来分を落としてから与信枠の空きを見るときである）
+  phaseCollect(rep);
+  phaseShip(rep);
+  phaseCosts(rep);
+  if (S.gameOver){ S.lastReport = rep; return; }
+  phaseRandomEvents(rep);
+  resolveDueClaims();
+  S.stats.frameUseSum += frameUsed()/Math.max(1,totalFrame()); S.stats.frameUseCnt++;
+  S.history.push({ turn:S.turn, cash:S.cash, equity:S.equity, sales:rep.sales,
+                   ar: S.receivables.filter(r=>!r.settled).reduce((a,r)=>a+r.amount,0) });
+  S.lastReport = rep;
+  if (CFG.closingTurns.includes(S.turn)) doClosing(rep);
+  if (S.turn >= CFG.turns){ finishGame(); return; }
+  // --- 次ターンへ ---
+  S.turn++;
+  S.turnExpense = 0; S.slotsUsed = 0;
+  if (CFG.fixedCostStepTurns.includes(S.turn) && S.turn > 1){
+    S.fixedCost += CFG.fixedCostStep;
+    log('4月。人件費の改定で固定費が月 +' + CFG.fixedCostStep + '万円 になった（月 ' + man(S.fixedCost) + '）。','warn');
+  }
+  phaseTransitions();
+  resolveDueClaims();
+  resolveSurveys();
+  tickLegacy();
+  fireFixedEvents();
+  fireTraps();
+  generateLeads();
+}
+
+/* §6.3 調査は翌ターンに結果が出る */
+function resolveSurveys(){
+  const done = S.surveys.filter(s=>s.turn <= S.turn);
+  S.surveys = S.surveys.filter(s=>s.turn > S.turn);
+  for (const s of done){
+    const co = findCo(s.coId);
+    if (!co) continue;
+    if (s.kind === 'registry'){
+      co.registryChecked = true;
+      co.roomLower = Math.max(1, co.room - 1);
+      log('【調査結果】' + co.name + ' の登記: ' + co.registryFlags.join(' / ') + ' ／ 交渉余地は ' + co.roomLower + ' 以上','info');
+      if (co.trap === 'fraud' || co.suspicious) giveCard('registry-flags');
+    } else {
+      co.creditChecked = true;
+      co.roomRange = [Math.max(1,co.room-0), Math.min(4,co.room+1)];
+      if (co.score === null) co.score = ri(38, 64);
+      let extra = '';
+      if (co.trap === 'fraud') extra = ' ★ 2年前に買収された休眠会社であることが判明した。';
+      else if (co.trap === 'antisocial') extra = ' ★ 反社会的勢力との関係が確認された。取引してはならない。';
+      else if (co.trap === 'circular') extra = ' ★ 紹介元の取引に商流の実体が確認できない。';
+      else if (co.suspicious) extra = ' 登記に不自然さはあるが、実需のある堅実な会社である。';
+      log('【調査結果】' + co.name + '：信用スコア ' + co.score + '（' + ratingOf(co).key + '）／交渉余地 ' +
+          co.roomRange[0] + '〜' + co.roomRange[1] + '。' + extra, extra ? 'warn':'info');
+      if (co.trap === 'antisocial') giveCard('illegal-liability');
+      if (co.trap === 'fraud') giveCard('torikomi');
+      if (co.trap === 'circular') giveCard('circular');
+    }
+  }
+}
+function findCo(id){ return S.companies.find(c=>c.id===id) || S.leads.find(c=>c.id===id); }
+
+/* §5.2 先代からの放置債権 */
+function tickLegacy(){
+  const L = S.legacy;
+  if (!L.alive) return;
+  if (S.turn >= L.deadline && !S.flags.legacySafe){
+    L.alive = false;
+    S.equity -= L.amount;
+    S.stats.badDebtGross += L.amount; S.stats.badDebtNet += L.amount;
+    log('★ 先代が放置していた売掛金 ' + man(L.amount) + ' が消滅時効を迎えた。催告も債務承認も打たなかったため、法的に請求できなくなった。','bad');
+    giveCard('prescription');
+  }
+}
+
+/* =========================================================================
+   §5.14 決算（第12・24・36ターン）
+   ========================================================================= */
+function doClosing(rep){
+  const writeoffs = S.companies.filter(c=>c.writeOffPending > 0);
+  S.pendingClosing = {
+    turn:S.turn, op:S.yearOp, sales:S.yearSales,
+    candidates: writeoffs.map(c=>({ id:c.id, name:c.name, amount:c.writeOffPending })),
+  };
+}
+function applyClosing(selectedIds){
+  const C = S.pendingClosing;
+  let wo = 0;
+  for (const id of selectedIds){
+    const co = S.companies.find(c=>c.id===id);
+    if (co){ wo += co.writeOffPending; co.writtenOff = true; co.writeOffPending = 0; }
+  }
+  const taxable = Math.max(0, C.op - wo);
+  const tax = taxable * CFG.tax;
+  S.cash -= tax; S.equity -= tax;
+  log('【決算】営業利益 ' + man(C.op) + ' ／ 貸倒計上 ' + man(wo) + ' → 課税所得 ' + man(taxable) +
+      '、納税 ' + man(tax) + ' を支払った。','info');
+  giveCard('bad-debt-tax');
+  S.yearOp = 0; S.yearSales = 0; S.pendingClosing = null;
+  if (S.cash < 0){ S.gameOver = { turn:S.turn, kind:'納税による資金ショート', cash:S.cash }; }
+}
+
+function finishGame(){
+  const net = S.stats.badDebtNet;
+  const rate = net / Math.max(1, S.stats.sales);
+  let grade;
+  if (net <= CFG.win.excellentAmt && rate <= CFG.win.excellentRate) grade = { key:'優', title:'無事故経営' };
+  else if (net <= CFG.win.goodAmt && rate <= CFG.win.goodRate) grade = { key:'良', title:'堅実経営' };
+  else grade = { key:'生存', title:'36ターンを生き延びた' };
+  S.ending = { grade, net, rate, cash:S.cash, equity:S.equity };
+}
+
+/* =========================================================================
+   §6.3 交渉余地モデル（新規契約・追加交渉に共通）
+   ========================================================================= */
+function negotiate(co, sgKeys, concKeys, atContract){
+  sgKeys = sgKeys.filter(k=>safeguardAvailable(CFG.safeguards.find(s=>s.key===k)));   // §3.5 未開放の保全は要求できない
+  const room = currentRoom(co, atContract) + concKeys.length;
+  const req = sgKeys.reduce((a,k)=>a + CFG.safeguards.find(s=>s.key===k).pt, 0);
+  if (req <= room) return { ok:true, room, req };
+  if (req === room + 1){
+    // 1pt 超過 → 相手が代替案を出す（§6.3）
+    const sorted = sgKeys.slice().sort((a,b)=>CFG.safeguards.find(s=>s.key===b).pt - CFG.safeguards.find(s=>s.key===a).pt);
+    const drop = sorted[0];
+    let counter = sgKeys.filter(k=>k!==drop);
+    if (drop === 'notarial') counter.push('eol');
+    if (drop === 'guarantor' || drop === 'collateral') counter.push('retention');
+    counter = [...new Set(counter)];
+    const cReq = counter.reduce((a,k)=>a + CFG.safeguards.find(s=>s.key===k).pt, 0);
+    if (cReq <= room) return { ok:false, counter, room, req };
+    return { ok:false, counter:[], room, req };
+  }
+  return { ok:false, lost:true, room, req };
+}
+function applyConcessions(co, concKeys){
+  for (const k of concKeys){
+    if (k === 'discount') co.priceIdx *= 0.99;
+    if (k === 'site') co.terms.mo += 1;                 // 支払月を1ヶ月後ろへ（＝サイト30日延長）
+    if (k === 'volume') co.order = Math.round(co.order * 0.8);
+  }
+  co.concessions = (co.concessions||[]).concat(concKeys);
+}
+function grantSafeguards(co, sgKeys){
+  for (const k of sgKeys){
+    const sg = CFG.safeguards.find(s=>s.key===k);
+    co.safeguards[k] = { turn:S.turn, pt:sg.pt };
+    S.stats.safeguardsTaken++;
+  }
+}
+
+/** 引合いを受ける（掛売り） */
+function acceptLead(co, limit, sgKeys, concKeys, guarantorCap){
+  const res = negotiate(co, sgKeys, concKeys, true);
+  if (res.lost || (!res.ok && (!res.counter || !res.counter.length))){
+    log('✕ ' + co.name + ' との交渉は決裂した（要求 ' + res.req + 'pt に対し、相手の交渉余地は届かなかった）。','warn');
+    S.leads = S.leads.filter(l=>l.id!==co.id);
+    return { lost:true };
+  }
+  if (!res.ok) return { counter:res.counter };     // 対案 → UI で再提示
+  sgKeys = sgKeys.filter(k=>safeguardAvailable(CFG.safeguards.find(s=>s.key===k)));
+  applyConcessions(co, concKeys);
+  grantSafeguards(co, sgKeys);
+  if (sgKeys.includes('guarantor')) co.guarantorCap = guarantorCap || null;
+  co.isLead = false; co.limit = limit; co.startTurn = S.turn; co.active = true;
+  S.companies.push(co);
+  S.leads = S.leads.filter(l=>l.id!==co.id);
+  log('◎ ' + co.name + ' と掛取引を開始した。限度額 ' + man(limit) + '／保全 ' +
+      (sgKeys.length ? sgKeys.map(k=>CFG.safeguards.find(s=>s.key===k).label).join('・') : 'なし') +
+      (concKeys.length ? '／差し出したもの: ' + concKeys.map(k=>CFG.concessions.find(c=>c.key===k).label).join('・') : ''), 'good');
+  if (!sgKeys.length && unlocked('safeguardLight')) S.stats.safeguardMissed++;
+  if (sgKeys.includes('guarantor') && !guarantorCap) log('（連帯保証人の極度額は未入力のまま契約した）','');
+  return { ok:true };
+}
+function requestCash(co){
+  S.leads = S.leads.filter(l=>l.id!==co.id);
+  if (chance(0.40)){
+    log('✕ ' + co.name + ': 現金・前払いを要求したところ失注した（40%の失注リスク）。','warn');
+    S.stats.refused += co.order; S.stats.refusedCount++;
+    return false;
+  }
+  co.prepay = true; co.limit = 0; co.isLead = false; co.startTurn = S.turn;
+  S.companies.push(co);
+  log('◎ ' + co.name + ' と現金取引を開始した。リスクはゼロだが、相手が飲む条件は限られる。','good');
+  return true;
+}
+function refuseLead(co){
+  S.leads = S.leads.filter(l=>l.id!==co.id);
+  S.stats.refused += co.order; S.stats.refusedCount++;
+  // 裏で「断らなければどうなったか」を判定しておく（§8.4 回避した損失）
+  if (co.trap) S.stats.avoidedLoss += co.order * 2;
+  else if (chance(0.12)) S.stats.avoidedLoss += co.order * 1.5;
+  else S.stats.refusedHealthy += co.order;
+  log('― ' + co.name + ' の打診を断った（月 ' + man(co.order) + '）。','');
+}
+
+/* =========================================================================
+   §6.7 回収アクション ／ §6.8 その他のアクション（データ駆動。§11）
+   ========================================================================= */
+function inTrouble(co){ return ['delay','longdelay','legal'].includes(co.status); }
+function stockAlive(co){ return co.stock && S.turn < co.stock.resaleTurn; }
+function sgLabel(k){ return CFG.safeguards.find(s=>s.key===k).label; }
+
+/** 「いつまでなら取れたか」（§9.5・§3.5 の制約: 開放されていた機能しか挙げない） */
+function couldHaveSafeguard(co, key){
+  const sg = CFG.safeguards.find(s=>s.key===key);
+  const unlockT = sg.tier === 'light' ? CFG.unlock.safeguardLight : CFG.unlock.safeguardHeavy;
+  const start = co.startTurn || 1;
+  const out = [];
+  if (start >= unlockT) out.push('第' + start + 'ターンの契約時なら ' + sg.pt + 'pt で取れました');
+  else out.push('契約した第' + start + 'ターンにはこの手段をまだ扱えませんでした（第' + unlockT + 'ターンから）');
+  const win = Math.max(start, unlockT);
+  if (co.scoreDropTurn && co.scoreDropTurn > win) out.push('第' + win + '〜' + (co.scoreDropTurn-1) + 'ターンなら「保全条件を追加交渉する」で取れました（交渉余地 ' + Math.max(0,co.room-1) + '）');
+  else if (co.delayStartTurn && co.delayStartTurn > win) out.push('第' + win + '〜' + (co.delayStartTurn-1) + 'ターンなら「保全条件を追加交渉する」で取れました');
+  out.push('現在は交渉余地 ' + currentRoom(co,false) + ' で、取れません');
+  return out;
+}
+
+const COLLECT_ACTIONS = [
+  { key:'dun', label:'電話・訪問で督促', cost:0, effect:'回収率 +5〜10pt',
+    ok: co=>inTrouble(co), why: ()=>'遅延が起きていない取引先には使いません',
+    run: co=>{ const b = 0.05 + rnd()*0.05; co.recoveryBonus += b; co.actionsTaken.dun = true;
+      log(co.name + ' に督促した。回収率 +' + pct(b,0) + '。次ターンの入金確率も上がる。','info'); } },
+
+  { key:'mail', label:'内容証明で催告', cost:CFG.cost.contentsMail, effect:'+10pt／時効の完成猶予6ヶ月',
+    ok: co=>inTrouble(co), why: ()=>'遅延が起きていない取引先には使いません',
+    run: co=>{ co.recoveryBonus += 0.10; co.actionsTaken.mail = true; co.tokkou = S.turn + 6;
+      log(co.name + ' に内容証明で催告した。回収率 +10pt。催告から6ヶ月は時効が完成しない（民法150条）が、関係は悪化した。','info');
+      giveCard('dunning-vs-demand'); giveCard('prescription'); } },
+
+  { key:'plan', label:'支払計画を合意する', cost:0, effect:'+15pt／債務承認により時効が更新',
+    ok: co=>co.status==='delay'||co.status==='longdelay', why: ()=>'法的整理に入った後や、正常な取引先には使いません',
+    run: co=>{ co.recoveryBonus += 0.15; co.actionsTaken.plan = true;
+      log(co.name + ' と支払計画に合意した。債務承認により時効は更新される（民法152条）。ただし回収は長期化し、その間の倒産リスクを負う。','info');
+      giveCard('prescription'); } },
+
+  { key:'notarialNow', label:'公正証書を作る', cost:CFG.cost.notarial, effect:'以後、裁判なしで差押えに進める',
+    ok: co=>!co.safeguards.notarial && currentRoom(co,false) >= 2 && unlocked('safeguardHeavy'),
+    why: co=>!unlocked('safeguardHeavy') ? '第' + CFG.unlock.safeguardHeavy + 'ターンから扱えます'
+            : co.safeguards.notarial ? '既に取得しています' : '相手の協力（交渉余地2以上）が必要です。現在の余地は ' + currentRoom(co,false),
+    run: co=>{ co.safeguards.notarial = { turn:S.turn, pt:2 }; S.stats.safeguardsTaken++;
+      log(co.name + ' と債務承認弁済契約を公正証書にした。執行力を先に手に入れたことになる。','good'); giveCard('notarial-deed'); } },
+
+  { key:'offset', label:'相殺する', cost:0, effect:'買掛金の範囲を100%回収',
+    ok: co=>co.isSupplier && co.apBalance > 0 && inTrouble(co),
+    why: co=>!co.isSupplier ? 'この取引先から仕入れていません' : co.apBalance<=0 ? 'この取引先への買掛金がありません' : '遅延が起きていません',
+    could: co=>['仕入設定で「売り先を兼ねる相手から」を選び、この取引先を仕入先に指定しておけば、買掛金の範囲は確実に回収できました（仕入価格は3%高くなります）'],
+    run: co=>{ co.actionsTaken.offset = true;
+      log(co.name + ' に対する買掛金 ' + man(co.apBalance) + ' と売掛金を相殺する意思表示をした（民法505条）。この範囲は確実に回収できる。','good'); giveCard('offset'); } },
+
+  { key:'repossess', label:'商品を引き揚げる', cost:CFG.cost.repossess, effect:'+20〜40pt',
+    ok: co=>!!co.safeguards.retention && stockAlive(co) && inTrouble(co),
+    why: co=>!co.safeguards.retention ? '所有権留保の合意がありません'
+            : !stockAlive(co) ? '納品物は第' + (co.stock? co.stock.resaleTurn : '—') + 'ターンに売り切られました' : '遅延が起きていません',
+    could: co=>!co.safeguards.retention ? couldHaveSafeguard(co,'retention') : [],
+    run: co=>{ const b = 0.20 + rnd()*0.20; co.recoveryBonus += b; co.actionsTaken.repossess = true; co.stock = null;
+      log(co.name + ' から納品済みの商品を引き揚げた。回収率 +' + pct(b,0) + '。他の債権者との紛争リスクは残る。','good'); } },
+
+  { key:'lien', label:'動産売買先取特権を行使', cost:CFG.cost.lien, effect:'+30pt',
+    ok: co=>stockAlive(co) && inTrouble(co),
+    why: co=>!co.stock ? '納品物がありません'
+            : !stockAlive(co) ? '⏱ 納品物は第' + co.stock.resaleTurn + 'ターンに転売されました' : '遅延が起きていません',
+    could: co=>(co.stock && !stockAlive(co)) ? ['第' + (co.stock.resaleTurn-1) + 'ターンまでに実行すれば +30pt でした。食品は数日で売り切られます'] : [],
+    run: co=>{ co.recoveryBonus += 0.30; co.actionsTaken.lien = true;
+      log(co.name + ' に納品した動産について先取特権を行使した（民法311条・321条）。回収率 +30pt。','good'); giveCard('movables-lien'); } },
+
+  { key:'claimGuarantor', label:'連帯保証人に請求', cost:0, effect:'基準回収率 40〜90% を発動（極度額でキャップ）',
+    ok: co=>!!co.safeguards.guarantor && inTrouble(co),
+    why: co=>!co.safeguards.guarantor ? '連帯保証人を取得していません' : '遅延が起きていません',
+    could: co=>!co.safeguards.guarantor ? couldHaveSafeguard(co,'guarantor') : [],
+    run: co=>{ co.actionsTaken.claimGuarantor = true;
+      if (!co.guarantorCap){ log('★ ' + co.name + ' の連帯保証人に請求したが、極度額の定めがないため保証契約は無効だった（民法465条の2）。1円も取れない。','bad'); giveCard('guaranty-max'); }
+      else log(co.name + ' の連帯保証人に請求した。極度額 ' + man(co.guarantorCap) + ' の範囲で回収できる。','good'); } },
+
+  { key:'enforceCollateral', label:'担保を実行', cost:CFG.cost.seizure, effect:'基準回収率 70〜95% を発動',
+    ok: co=>!!co.safeguards.collateral && inTrouble(co),
+    why: co=>!co.safeguards.collateral ? '担保を取得していません' : '遅延が起きていません',
+    could: co=>!co.safeguards.collateral ? couldHaveSafeguard(co,'collateral') : [],
+    run: co=>{ co.actionsTaken.enforceCollateral = true;
+      log(co.name + ' から取っていた物的担保を実行した。優先して回収できる。','good'); } },
+
+  { key:'lawsuit', label:'支払督促・訴訟', cost:CFG.cost.lawsuit, effect:'2〜4ターンで債務名義を得る',
+    ok: co=>inTrouble(co) && !co.title && !co.lawsuitTurn, why: co=>co.title||co.lawsuitTurn ? '既に手続中／債務名義を取得済みです' : '遅延が起きていません',
+    run: co=>{ co.lawsuitTurn = S.turn + ri(2,4); co.actionsTaken.lawsuit = true;
+      log(co.name + ' に対して支払督促・訴訟を申し立てた（費用 ' + man(CFG.cost.lawsuit) + '）。第' + co.lawsuitTurn + 'ターンに債務名義を得る。費用が回収額を上回ることもある。','info'); } },
+
+  { key:'seizure', label:'差押えを申し立てる', cost:CFG.cost.seizure, effect:'+25pt',
+    ok: co=>(!!co.safeguards.notarial || !!co.title) && inTrouble(co),
+    why: co=>(!co.safeguards.notarial && !co.title) ? '債務名義がありません（執行力のある公正証書があれば今すぐ使えました）' : '遅延が起きていません',
+    could: co=>(!co.safeguards.notarial && !co.title) ? couldHaveSafeguard(co,'notarial').concat(['または「支払督促・訴訟」で2〜4ターンかけて債務名義を取る']) : [],
+    run: co=>{ co.recoveryBonus += 0.25; co.actionsTaken.seizure = true;
+      log(co.name + ' の資産に差押えを申し立てた。回収率 +25pt。相手を倒産に追い込むことになる。','info'); giveCard('seizure'); } },
+
+  { key:'proof', label:'債権届出をする', cost:0, effect:'配当を待つ（一般に数%）',
+    ok: co=>co.status==='legal', why: ()=>'相手が法的整理に入ってから使います',
+    run: co=>{ co.recoveryBonus += 0.02; co.actionsTaken.proof = true;
+      log(co.name + ' の手続に債権届出をした。売掛金は一般の破産債権で、配当はほとんど残らない。','info'); giveCard('bankruptcy-priority'); } },
+];
+
+/* 先代の放置債権に対する時効対策 */
+function legacyAction(kind){
+  if (kind === 'mail'){ S.legacy.deadline += 6; log('先代の放置債権について内容証明で催告した。時効の完成が6ヶ月猶予され、期限は第' + S.legacy.deadline + 'ターンになった（民法150条・延命）。','info'); }
+  if (kind === 'ack'){ S.flags.legacySafe = true; S.legacy.alive = false; S.cash += S.legacy.amount * 0.6;
+    log('先代の放置債権について債務者から債務の承認を得た。時効は更新され（民法152条）、' + man(S.legacy.amount*0.6) + ' を分割で回収できた。','good'); }
+  giveCard('prescription');
+}
+
+const OTHER_ACTIONS = [
+  { key:'registry', label:'登記を確認する', cost:CFG.cost.registry, need:'—',
+    desc:'商号・本店・事業目的・役員の変更履歴が分かる。交渉余地の下限も分かる。結果は翌ターン。' },
+  { key:'credit', label:'信用調査を依頼する', cost:CFG.cost.credit, need:'—',
+    desc:'信用スコア・反社関係・休眠会社の買収・交渉余地のレンジが分かる。結果は翌ターン。' },
+  { key:'onsite', label:'現物を確認する', cost:CFG.cost.onsite, need:'—',
+    desc:'取引に実体があるかを確かめる（架空循環取引の見抜き方）。' },
+  { key:'renego', label:'保全条件を追加交渉する', cost:0, need:'交渉余地',
+    desc:'既存取引先から保全を取る。成否は交渉余地で決まる。' },
+  { key:'passthru', label:'価格転嫁を交渉する', cost:0, need:'—',
+    desc:'仕入価格の上昇分を売価に反映する。決裂すると取引が縮小する。' },
+  { key:'denki', label:'電子記録債権への移行を交渉する', cost:0, need:'—',
+    desc:'紙の手形が使えなくなった後も取引を続けられるようにする。' },
+];
+
+function useSlot(n){ S.slotsUsed += (n===undefined?1:n); }
+function slotsTotal(){ return CFG.actionSlotsBase + S.employees; }
+function slotsLeft(){ return slotsTotal() - S.slotsUsed; }
+function spend(amount){ S.turnExpense = (S.turnExpense||0) + amount; }
+
+function runCollectAction(coId, key){
+  const co = findCo(coId); const a = COLLECT_ACTIONS.find(x=>x.key===key);
+  if (!co || !a || !a.ok(co) || slotsLeft() <= 0) return false;
+  useSlot(); spend(a.cost); a.run(co);
+  S.stats.actionsUsed[key] = (S.stats.actionsUsed[key]||0) + 1;
+  return true;
+}
+function runSurvey(coId, kind){
+  if (slotsLeft() <= 0) return false;
+  const co = findCo(coId); if (!co) return false;
+  useSlot(); spend(kind === 'registry' ? CFG.cost.registry : CFG.cost.credit);
+  S.surveys.push({ coId, kind, turn:S.turn + 1 });
+  S.stats.actionsUsed[kind] = (S.stats.actionsUsed[kind]||0) + 1;
+  log(co.name + ' の' + (kind==='registry'?'登記を確認':'信用調査を依頼') + 'した。結果は翌ターンに出る。','info');
+  return true;
+}
+function runOnsite(coId){
+  if (slotsLeft() <= 0) return false;
+  const co = findCo(coId); if (!co) return false;
+  useSlot(); spend(CFG.cost.onsite);
+  if (co.trap === 'circular'){
+    co.exposed = true;
+    log('★ ' + co.name + ' の倉庫を訪ねた。伝票上は毎月動いているはずの商品が、一度も動いていない。架空循環取引である。','bad');
+    giveCard('circular');
+  } else {
+    log(co.name + ' の現物を確認した。商品は実際に動いており、取引に実体がある。','good');
+  }
+  return true;
+}
+function runPassthru(coId){
+  if (slotsLeft() <= 0) return false;
+  const co = findCo(coId); if (!co) return false;
+  useSlot();
+  if (chance(0.6)){
+    co.priceIdx = Math.min(co.priceIdx * 1.15, S.costIdx);
+    log('◎ ' + co.name + ' との価格転嫁交渉が成立した。この取引先の粗利率は ' + pct(marginOf(co)) + ' に戻った。','good');
+  } else {
+    co.order = Math.round(co.order * 0.90);
+    log('✕ ' + co.name + ' との価格転嫁交渉は決裂し、発注が10%減った。','warn');
+  }
+  return true;
+}
+/** 全取引先への価格改定の通告（1枠）。まとめて転嫁できるが、飲まない相手は発注を減らす */
+function runBulkPrice(){
+  if (slotsLeft() <= 0) return false;
+  useSlot();
+  let ok = 0, ng = 0;
+  for (const co of S.companies){
+    if (!co.active || co.status !== 'normal') continue;
+    if (chance(0.7)){ co.priceIdx = S.costIdx; ok++; }
+    else { co.order = Math.round(co.order * 0.95); ng++; }
+  }
+  log('全取引先に価格改定を通告した。' + ok + '社が受け入れ、' + ng + '社が発注を10%減らした。','warn');
+  return true;
+}
+
+function runDenki(coId){
+  if (slotsLeft() <= 0) return false;
+  const co = findCo(coId); if (!co) return false;
+  useSlot();
+  if (chance(0.7)){
+    co.refusesDenki = false; co.denkiDeadline = null;
+    log('◎ ' + co.name + ' は電子記録債権（でんさい）への移行に応じた。取引を続けられる。','good');
+  } else {
+    log('✕ ' + co.name + ' は紙での支払に固執している。次のターンまでに合意できなければ取引は止まる。','warn');
+  }
+  giveCard('note-abolition');
+  return true;
+}
+function runRenego(coId, sgKeys, concKeys, guarantorCap){
+  const co = findCo(coId); if (!co || slotsLeft() <= 0) return { fail:true };
+  const res = negotiate(co, sgKeys, concKeys, false);
+  useSlot();
+  if (!res.ok){
+    log('✕ ' + co.name + ' との保全条件の追加交渉は決裂した（要求 ' + res.req + 'pt ／ 調整後の余地 ' + res.room + '）。','warn');
+    return { lost:true };
+  }
+  sgKeys = sgKeys.filter(k=>safeguardAvailable(CFG.safeguards.find(s=>s.key===k)));
+  applyConcessions(co, concKeys);
+  grantSafeguards(co, sgKeys);
+  if (sgKeys.includes('guarantor')) co.guarantorCap = guarantorCap || null;
+  log('◎ ' + co.name + ' から ' + sgKeys.map(sgLabel).join('・') + ' を取得した' +
+      (concKeys.length ? '（差し出したもの: ' + concKeys.map(k=>CFG.concessions.find(c=>c.key===k).label).join('・') + '）':'') + '。','good');
+  giveCard('safeguard-timing');
+  return { ok:true };
+}
+
+/* §6.8 資金の手当て */
+function factorableList(){
+  return S.receivables.filter(r=>{
+    const co = findCo(r.coId);
+    return !r.settled && r.kind==='ar' && co && co.status==='normal';
+  });
+}
+function factoringFee(r){
+  const remain = Math.max(0, r.dueTurn - S.turn);
+  return clamp(0.15 - 0.045*remain, 0.05, 0.15);
+}
+function runFactoring(rid){
+  const r = S.receivables.find(x=>x.id===rid); if (!r || slotsLeft()<=0) return false;
+  const fee = factoringFee(r); const cashGot = r.amount * (1-fee);
+  useSlot(); r.settled = true; r.factored = true;
+  S.cash += cashGot; S.equity -= r.amount * fee;
+  log('ファクタリングで売掛 ' + man(r.amount) + ' を譲渡し、手数料 ' + pct(fee,0) + '（' + man(r.amount*fee) +
+      '）を引いた ' + man(cashGot) + ' を受け取った。これは借入ではなく債権の売買である。','warn');
+  giveCard('factoring');
+  return true;
+}
+function runDiscountNote(rid){
+  const r = S.receivables.find(x=>x.id===rid); if (!r || slotsLeft()<=0) return false;
+  const remain = Math.max(0, r.cashTurn - S.turn);
+  const fee = 0.005 + 0.01*remain;
+  useSlot(); r.settled = true;
+  S.cash += r.amount*(1-fee); S.equity -= r.amount*fee;
+  log('手形 ' + man(r.amount) + ' を割り引いた。割引料 ' + pct(fee,1) + '（' + man(r.amount*fee) + '）。','warn');
+  giveCard('note-not-cash');
+  return true;
+}
+function runLoan(amount){
+  if (slotsLeft()<=0) return false;
+  useSlot();
+  S.loans.push({ left:amount, rate:0.03, monthly: amount/24 });
+  S.cash += amount;
+  log('銀行から ' + man(amount) + ' を借り入れた。返済（24回）と利息が毎月の固定的な負担になる。','warn');
+  return true;
+}
+function runHire(){
+  if (slotsLeft()<=0) return false;
+  useSlot(); S.employees++;
+  log('人を1人増やした。アクション枠が ' + slotsTotal() + ' に、引合いも増える。固定費は月 +' + CFG.employeeCost + '万円。','info');
+  return true;
+}
+function toggleSupplier(coId){
+  const co = findCo(coId); if (!co) return;
+  co.isSupplier = !co.isSupplier;
+  log(co.name + ' を仕入先に' + (co.isSupplier?'指定した（仕入価格は3%高くなるが、焦げたとき相殺できる）':'指定するのをやめた') + '。','info');
+  giveCard('supplier-choice');
+}
+function setLimit(coId, v){
+  const co = findCo(coId); if (!co) return { ok:false };
+  const cap = perCompanyCap(co);
+  const others = frameUsed() - co.limit;
+  if (v > co.limit){
+    if (co.limit > cap) return { ok:false, msg:'この取引先は既に格付上限を超えています（経過措置）。増額はできません。' };
+    if (v > cap) return { ok:false, msg:'格付「' + ratingOf(co).key + '」の1社上限 ' + man(cap) + ' を超えています。' };
+    if (others + v > totalFrame()) return { ok:false, msg:'総与信枠 ' + man(totalFrame()) + ' を超えます。他社の限度額を減らして枠を空けてください。' };
+  }
+  co.limit = v;
+  return { ok:true };
+}
+
+/* =========================================================================
+   §7 イベント
+   ========================================================================= */
+function queuePrompt(id, p){ S.promptQueue = S.promptQueue || []; S.promptQueue.push({ id, p: p||{} }); }
+function mainCo(){ return S.companies.find(c=>c.main && c.active); }
+function pickCo(f){ const l = S.companies.filter(c=>c.active && c.status==='normal' && (!f || f(c))); return l.length ? pick(l) : null; }
+
+const PROMPTS = {
+  intro: {
+    title:'就任 ―― 掛売りとは何か',
+    body:()=>`父の会社を継いだ。売上は月4,000万円、粗利率は16%、固定費は月590万円。営業利益は月50万円しかない。<br><br>
+      あなたが売るとき、代金はその場で入らない。物を渡して<b>売掛金という債権</b>を持つだけである。債権は財産なので、譲れる・相殺できる・担保にできる。そして<b>放っておくと消える</b>。<br><br>
+      売掛残高は8,000万円（月商の2ヶ月分）。既存6社について、保全は<b>何も取っていない</b>。うち1社が売上の35%を占め、その残高2,800万円は格付「上位」の上限1,400万円を大幅に超えている（経過措置として許容するが、増額はできない）。<br><br>
+      先代が回収を放置した売掛金が430万円ある。<b>第14ターンに時効を迎える</b>。<br><br>
+      36ターン生き延び、焦げ付きを出さないことが目標である。`,
+    options:[{ label:'引き継ぐ', run:()=>{ giveCard('site-basics'); giveCard('limit-not-monthly'); } }],
+  },
+  t3big: {
+    title:'第3ターン ―― 大口の引合い',
+    body:()=>`大手スーパーのチェーンから月800万円の引合いが来た。条件は末締め翌月末払い・現金。<br><br>
+      判断するのは<b>与信限度額だけ</b>である。限度額は「未回収のまま許す残高の上限」であって、月商の上限ではない。<br>
+      サイト2.0ヶ月なら、月800万円を出荷し続けるには<b>1,600万円</b>の限度額が要る。総与信枠の残りと格付上限を見て決めること。`,
+    options:[{ label:'引合い一覧で判断する', run:()=>{ giveCard('limit-not-monthly'); } }],
+  },
+  t5note: {
+    title:'第5ターン ―― 手形サイト120日',
+    body:()=>`新規の引合いのうち1社が、支払を<b>手形サイト120日</b>で希望している。末締め翌月末払い（60日）と合わせると実質180日、売ってから半年である。<br><br>
+      2024年11月1日から、サイトが60日を超える手形は「割引困難な手形」として行政指導の対象になった。<b>短縮の交渉には法的な裏付けがある。</b><br><br>
+      あわせて、本日から<b>軽い保全条件（期限の利益喪失条項・所有権留保）</b>が交渉できるようになった。`,
+    options:[
+      { label:'60日に短縮するよう交渉する（成功60%）', run:(p)=>{
+          const lead = S.leads.find(l=>l.longNote);
+          if (!lead){ log('対象の引合いは既にない。','') ; return; }
+          if (chance(0.6)){ lead.terms.noteDays = 60; log('◎ 手形サイトを60日に短縮させた。実質サイトは120日になった。','good'); }
+          else log('✕ 交渉は不調。手形サイト120日のままである。','warn');
+          giveCard('sixty-days'); } },
+      { label:'そのまま受ける（判断は与信画面で）', run:()=>{ giveCard('note-not-cash'); } },
+    ],
+  },
+  t6delay: {
+    title:'第6ターン ―― 初めての遅延',
+    body:(p)=>`<b>${esc(p.name)}</b> が支払期日に入金しなかった。金額は小さいが、これが遅延の入口である。<br><br>
+      いま打てる手は4つ。<b>電話・訪問で督促</b>（無料。記録は残らない）、<b>内容証明で催告</b>（費用はかかるが、催告の事実と日付が証明でき、時効の完成が6ヶ月猶予される）、<b>支払計画を合意する</b>（債務承認により時効が更新される）、<b>支払督促・訴訟</b>。<br><br>
+      アクション枠は毎ターン ${CFG.actionSlotsBase} 件しかない。<b>誰を優先するか</b>が問われる。`,
+    options:[{ label:'回収画面を開く', run:()=>{ giveCard('dunning-vs-demand'); } }],
+  },
+  t8outsource: {
+    title:'第8ターン ―― 配送外注先への支払',
+    body:()=>`配送を委託している運送会社への支払 200万円が今月末に来る。資金繰りは楽ではない。<br><br>
+      来月に回すこともできるが、支払を遅らせれば相手の資金繰りを壊す。<b>あなたは払う側でもある。</b><br><br>
+      あわせて、本日から<b>重い保全条件（公正証書・物的担保・連帯保証人）</b>が交渉できるようになった。`,
+    options:[
+      { label:'期日に払う', run:()=>{ spend(200); log('配送外注先に期日どおり200万円を支払った。','') ; } },
+      { label:'来月に延ばす', run:()=>{ S.flags.latePay = true; S.payables.push({ turn:S.turn+1, amount: 200*1.0122 });
+          log('外注費の支払を来月に延ばした。遅延利息（年14.6%）が付く。第10ターンの取適法施行後は、この遅れが行政指導の対象になる。','warn'); giveCard('sixty-days'); } },
+    ],
+  },
+  t10law: {
+    title:'第10ターン（2026年1月）―― 取適法 施行',
+    body:()=>`下請法が改正され、<b>中小受託取引適正化法（取適法）</b>が施行された。手形払いの禁止、従業員数基準の導入、そして<b>特定運送委託の追加</b>。<br><br>
+      あなたの会社では3つのことが同時に起きる。<br>
+      ① <b>発荷主として配送を委託している分</b>: 新たに法の対象になる。運送会社への手形払いはできず、役務の提供を受けた日から60日以内に払う義務を負う。<b>守る側</b>である。<br>
+      ② <b>大手小売のPB商品を受託製造している分</b>: 相手からの手形払いが現金払いに変わる。<b>保護される側</b>である。<br>
+      ③ <b>通常の卸売（商品を仕入れて売る分）</b>: <b>何も変わらない</b>。単純な物品の売買は取適法の対象外である。<br><br>
+      「法改正で手形がなくなった」は誤りである。一般の販売先からの受取手形が使えなくなるのは、<b>第24ターン（2027年3月末）の紙の手形・小切手の利用終了</b>のほうである。`,
+    options:[{ label:'理解した', run:()=>{ S.flags.toriteki = true; S.cash += 120; log('PB受託分の手形払いが現金払いに変わり、120万円が現金で入った。通常の卸売の受取手形はそのままである。','good'); giveCard('toriteki'); } }],
+  },
+  t11rebate: {
+    title:'第11ターン ―― 期末リベートを前提にした大口案件',
+    body:()=>`「年間の仕入額が目標に届けば、期末に販売奨励金（リベート）を出す」という条件付きの大口案件が来た。<br>
+      案件そのものの粗利率は<b>6%</b>しかない。リベートが出れば帳尻は合うが、出るかどうかは相手の裁量である。`,
+    options:[
+      { label:'受ける（月500万・粗利6%）', run:()=>{
+          const co = makeLead({ name:'株式会社アズマ流通センター', industry:'retail', order:500, score:66,
+                                terms:{closing:30,mo:1,day:30,method:'cash',noteRatio:0,noteDays:0} });
+          co.priceIdx = 0.90; co.rebate = true; co.isLead = false; co.limit = Math.min(1000, frameFree()); co.startTurn = S.turn;
+          if (co.limit < 200){ log('総与信枠に空きがなく、この案件は受けられなかった。','warn'); return; }
+          S.companies.push(co);
+          log('リベート前提の大口案件を受けた。限度額 ' + man(co.limit) + '。粗利率は6%しかない。','warn'); } },
+      { label:'断る', run:()=>{ log('リベート前提の案件を断った。','') ; } },
+    ],
+  },
+  t15cost: {
+    title:'第15ターン ―― 仕入価格の高騰',
+    body:()=>`仕入価格が上がった。現在の仕入原価指数は <b>${(S.costIdx*100).toFixed(0)}</b>（基準100）。<br>
+      粗利率16%の商売では、原価が10%上がるだけで粗利は半分近くまで落ちる。<b>価格転嫁を交渉する</b>アクションで、取引先ごとに売価へ反映させること。決裂すれば発注が減る。`,
+    options:[{ label:'交渉に回る', run:()=>{} }],
+  },
+  t20drop: {
+    title:'第20ターン ―― 主要取引先の信用スコアが急落',
+    body:(p)=>`売上の3割超を占める <b>${esc(p.name)}</b> の信用スコアが急落した。取引先の間で「支払いが遅いらしい」という噂も出ている。<br><br>
+      いま、この会社の交渉余地は<b>1に固定</b>された。物的担保（3pt）を取るには、対価を3つ全部差し出す必要がある（値引き1%＋サイト30日延長＋取引額20%減 → 余地4）。<b>短期的には確実に苦しくなる。</b><br>
+      切ることもできるが、売上の3割が消える。支え続ければ、焦げたときの傷はもっと深い。`,
+    options:[{ label:'理解した', run:()=>{ giveCard('share-trap'); giveCard('terms-change-signal'); } }],
+  },
+  t22bank: {
+    title:'第22ターン ―― 銀行からの案内',
+    body:()=>`取引銀行から案内が届いた。<b>紙の約束手形・小切手は2026年度末（2027年3月末）を目途に利用を終了</b>し、2027年度初から電子交換所での交換も廃止される。<br>
+      罰則のある義務ではないが、銀行が交換を取り扱わなくなるため実務上は使えなくなる。手形で払っている取引先とは、電子記録債権（でんさい）への切り替えを事前に交渉しておく必要がある。`,
+    options:[{ label:'理解した', run:()=>{ giveCard('note-abolition'); } }],
+  },
+  jump: {
+    title:(p)=>'手形ジャンプの要請',
+    body:(p)=>{
+      const co = findCo(p.coId);
+      const sgs = co ? Object.keys(co.safeguards).map(sgLabel) : [];
+      return `<b>${esc(co?co.name:'')}</b> から「手形の支払期日を2ヶ月延ばしてほしい」と申し入れがあった。<br><br>
+      資金が回っていないという申告に近い。断れば不渡りを出して倒産しかねず、応じれば回収がさらに遅れて傷が深くなる。<br>
+      現在この取引先から取っている保全: <b>${sgs.length?sgs.join('・'):'なし'}</b>／交渉余地 <b>${co?currentRoom(co,false):0}</b><br><br>
+      対価を3つ全部差し出せば余地は+3される。<b>資金の苦しい相手に、値引きとサイト延長と数量減を同時に飲ませる</b>ことの意味を考えること。`;
+    },
+    options:[
+      { label:'応諾する（回収が2ターン遅れる）', run:(p)=>{
+          const co = findCo(p.coId); if (!co) return;
+          S.receivables.forEach(r=>{ if (r.coId===co.id && !r.settled){ r.dueTurn += 2; if (r.cashTurn) r.cashTurn += 2; } });
+          co.jumpCount++; co.termsChanged = true; if (co.score!==null) co.score -= 3;
+          log(co.name + ' の手形ジャンプに応じた。回収は2ターン遅れ、以後の遅延確率は1.5倍になる。','warn'); giveCard('note-jump'); } },
+      { label:'断る（相手は法的整理に進みやすい）', run:(p)=>{
+          const co = findCo(p.coId); if (!co) return;
+          log(co.name + ' の手形ジャンプを断った。相手は資金繰りに行き詰まる可能性が高い。','warn');
+          if (chance(0.6)){ enterDelay(co, null); }
+          giveCard('note-jump'); } },
+      { label:'連帯保証人を条件に応諾する（3pt／対価3つを全部差し出す）', run:(p)=>{
+          const co = findCo(p.coId); if (!co) return;
+          const res = negotiate(co, ['guarantor'], ['discount','site','volume'], false);
+          if (res.ok){
+            applyConcessions(co, ['discount','site','volume']);
+            grantSafeguards(co, ['guarantor']);
+            co.guarantorCap = Math.round(outstanding(co));
+            S.receivables.forEach(r=>{ if (r.coId===co.id && !r.settled){ r.dueTurn += 2; if (r.cashTurn) r.cashTurn += 2; } });
+            co.termsChanged = true;
+            log('◎ ' + co.name + ' から連帯保証人（極度額 ' + man(co.guarantorCap) + '）を取ったうえでジャンプに応じた。取れたが、非常に高い買い物である。','good');
+          } else {
+            log('✕ ' + co.name + ' は連帯保証人の差し入れを拒否した。交渉余地が足りない（要求3pt ／ 調整後の余地 ' + res.room + '）。取引開始時なら2〜3ptで済んだ話である。','warn');
+          }
+          giveCard('note-jump'); giveCard('safeguard-timing'); } },
+    ],
+  },
+  t24paper: {
+    title:'第24ターン（2027年3月）―― 紙の手形・小切手の利用終了',
+    body:()=>`紙の約束手形・小切手の利用が終了した。今後、受取手形は発生しない（既存の手形は期日どおり決済される）。<br>
+      資金繰りは楽になるが、<b>第25ターン以降、紙での支払に固執して電子記録債権への移行を拒む取引先</b>が現れる。移行交渉に応じなければ取引は止まる。`,
+    options:[{ label:'理解した', run:()=>{ S.flags.paperNoteEnd = true; giveCard('note-abolition'); } }],
+  },
+  t26market: {
+    title:'第26ターン ―― 市場の縮小',
+    body:(p)=>`${esc(p.label)}業界が縮小し、その業種の取引先の発注が一律に2割減った。<br>
+      与信管理を完璧にこなしても、売れないリスクは消えない。固定費は毎年上がる。<b>守りに入るだけでは勝てない</b>。`,
+    options:[{ label:'理解した', run:()=>{} }],
+  },
+  t27stop: {
+    title:'第27ターン ―― 納品直後に取引先が事業停止',
+    body:(p)=>{
+      const co = findCo(p.coId);
+      return `<b>${esc(co?co.name:'')}</b> が事業を停止した。先週納品したばかりの商品 ${man(co?co.stock.amount:0)} 分は、<b>まだ相手の倉庫に残っている</b>。<br><br>
+      自分が売った動産の代金は、その動産から優先して回収できる（動産売買先取特権・民法311条321条）。契約書に書いていなくても法律上当然に発生する。<b>ただし、売り切られたら終わりである。</b><br>
+      この納品物は<b>次のターンには転売される</b>。使うなら今ターンしかない。`;
+    },
+    options:[{ label:'回収画面を開く', run:()=>{ giveCard('movables-lien'); } }],
+  },
+  t30legal: {
+    title:'第30ターン ―― 主要取引先の法的整理',
+    body:(p)=>{
+      const co = findCo(p.coId);
+      const sgs = co ? Object.keys(co.safeguards).map(sgLabel) : [];
+      return `<b>${esc(co?co.name:'')}</b> が${esc(p.kind)}手続に入った。売掛 ${man(p.amount)}。<br><br>
+      いま持っている保全: <b>${sgs.length?sgs.join('・'):'なし'}</b><br>
+      個別の回収は止まり、配当を待つ立場になる。配当の順位は、担保権者（別除権）→ 財団債権・優先的破産債権 → 一般の破産債権。<b>売掛金は最後尾</b>である。<br><br>
+      結末は<b>2ターン後に確定する</b>。それまでに、担保の実行・連帯保証人への請求・相殺・債権届出を打っておくこと。持っていない手段は打てない。`;
+    },
+    options:[{ label:'回収画面を開く', run:()=>{ giveCard('bankruptcy-priority'); } }],
+  },
+  t34last: {
+    title:'第34ターン ―― 最後の大口引合い',
+    body:()=>`最後の大口の引合いが来た。ここまでに学んだことを全部使って判断すること。<br>
+      サイトを読む。限度額を残高の上限として決める。実効サイトで月次の出荷可能額に換算する。総与信枠の残りを確かめる。保全を何と交換するかを決める。調べる時間があるかを考える。`,
+    options:[{ label:'引合いを見る', run:()=>{} }],
+  },
+  fraudMain: {
+    title:'与信限度額の引き上げ要請',
+    body:(p)=>{
+      const co = findCo(p.coId);
+      return `<b>${esc(co?co.name:'')}</b> から大口の注文が入った。<b>月2,000万円</b>。これまで小口だが一度の遅延もなく、毎回きっちり期日に払ってきた相手である。<br><br>
+      「取引を大きくしたい。ついては<b>与信限度額を2,000万円に引き上げてほしい</b>。支払は末締め翌々月末で」<br><br>
+      現在の限度額は ${man(co?co.limit:0)}、格付は「${co?ratingOf(co).key:''}」で1社上限は ${man(co?perCompanyCap(co):0)}。<br>
+      <b>引き上げなければ、出荷は限度額で止まる。</b>調べる手はまだある ―― 登記の確認（数千円）と信用調査（数万円）。ただし結果は翌ターンに出る。`;
+    },
+    options:[
+      { label:'限度額は据え置く（出荷は現在の枠で止まる）', run:(p)=>{ log('限度額を据え置いた。大口注文は枠の範囲でしか出荷されない。','') ; } },
+      { label:'まず調べる（アクション枠を使う）', run:(p)=>{ log('調べてから判断することにした。取引先一覧から登記確認・信用調査を実行すること。','info'); } },
+      { label:'取引を断る', run:(p)=>{ const co = findCo(p.coId); if (co){ co.active=false; co.order=0;
+          S.stats.avoidedLoss += 2000*2; log(co.name + ' との取引を打ち切った。','good'); } } },
+    ],
+  },
+  circularMain: {
+    title:'儲かる話',
+    body:()=>`古い付き合いの同業者から話が持ち込まれた。<br><br>
+      「うちが仕入れる分を、御社の伝票を通してほしい。商品は先方に直送するから倉庫も要らない。<b>伝票を通すだけで口銭3%</b>。1件1,500万円、月1回。支払は末締め翌月末で確実。<br>
+      御社は物を仕入れて売るのが本業でしょう。何も変わりませんよ」<br><br>
+      粗利率16%の商売で、手間なしの3%。年間で540万円 ―― <b>今の営業利益の丸1年分に近い</b>。`,
+    options:[
+      { label:'乗る', run:(p)=>{
+          const co = makeLead({ name:'株式会社ミナミ通商', industry:'retail', order:1500, score:64, trap:'circular',
+                                terms:{closing:30,mo:1,day:30,method:'cash',noteRatio:0,noteDays:0} });
+          co.isLead = false; co.priceIdx = 0.87; co.limit = 3000; co.startTurn = S.turn; co.circular = true;
+          S.companies.push(co);
+          const tp = S.trapPlan.find(t=>t.kind==='circular'); if (tp){ tp.taken = true; tp.coId = co.id; tp.burstTurn = S.turn + ri(4,6); }
+          log('口銭3%の話に乗った。今月から伝票が回り始める。','warn'); } },
+      { label:'現物を確認する（アクション枠1）', run:(p)=>{
+          if (slotsLeft() <= 0){ log('アクション枠がなく、現物を確認できなかった。','warn'); return; }
+          useSlot(); spend(CFG.cost.onsite);
+          log('★ 倉庫を訪ねた。伝票上は毎月動いているはずの商品が、一度も動いていない。A社から仕入れてB社へ売り、B社がまたA社へ売る ―― 伝票だけが回る架空循環取引である。','bad');
+          S.stats.avoidedLoss += 3000; giveCard('circular'); } },
+      { label:'断る', run:()=>{ S.stats.avoidedLoss += 3000; log('儲かる話を断った。何も起きなかった。','good'); } },
+    ],
+  },
+  antisocialPenalty: {
+    title:'取引先の離反',
+    body:(p)=>`<b>${esc(p.name)}</b> と反社会的勢力との関係が表沙汰になった。当社が取引を続けていたことが知られ、複数の取引先が離れた。<br>
+      <b>月商が15%減った。</b>財務内容がどれほど良好でも、この相手とは取引してはならなかった。信用調査を1件（数万円）打っていれば分かったことである。`,
+    options:[{ label:'…', run:()=>{ giveCard('illegal-liability'); } }],
+  },
+  noteDrawer: {
+    title:'回し手形の不渡り',
+    body:(p)=>`<b>${esc(p.name)}</b> から受け取っていた手形は、第三者が振り出した<b>回し手形</b>だった。その振出人が倒産し、手形は不渡りになった。<br>
+      手形金 ${man(p.amount)} のうち、回収できるのはごく一部である。裏書人への遡求は可能だが、相手も同時に苦しくなっている。`,
+    options:[{ label:'…', run:(p)=>{
+        const co = findCo(p.coId); if (!co) return;
+        let lost = 0;
+        S.receivables.forEach(r=>{ if (r.coId===co.id && !r.settled && r.kind==='note'){ r.settled = true; lost += r.amount; } });
+        const got = lost * 0.10; S.cash += got; S.equity -= (lost-got);
+        S.stats.badDebtGross += lost; S.stats.badDebtNet += (lost-got);
+        log('回し手形 ' + man(lost) + ' が不渡りになり、' + man(lost-got) + ' が焦げ付いた。','bad');
+        giveCard('note-not-cash'); } }],
+  },
+  denkiRefuse: {
+    title:'電子記録債権への移行拒否',
+    body:(p)=>`<b>${esc(p.name)}</b> が「紙の手形でなければ払えない」と言っている。紙の手形はもう使えない。<br>
+      「電子記録債権への移行を交渉する」アクションで合意できなければ、<b>次のターンで取引が止まる</b>。`,
+    options:[{ label:'理解した', run:()=>{ giveCard('note-abolition'); } }],
+  },
+};
+
+/* ---- 固定イベント（§7.1） ---- */
+function fireFixedEvents(){
+  const t = S.turn;
+  const once = (k)=>{ if (S.eventsDone[k]) return false; S.eventsDone[k] = t; return true; };
+
+  if (t === 1 && once('intro')) queuePrompt('intro');
+
+  if (t === 3 && once('t3big')){
+    S.leads.push(makeLead({ name:'株式会社サンフレッシュ関東', industry:'retail', order:800, score:66,
+                            terms:{closing:30,mo:1,day:30,method:'cash',noteRatio:0,noteDays:0} }));
+    queuePrompt('t3big');
+  }
+  if (t === 5 && once('t5note')){
+    const lead = makeLead({ name:'株式会社ミヤマ建工', industry:'const', order:600, score:58,
+                            terms:{closing:30,mo:1,day:30,method:'note',noteRatio:1.0,noteDays:120} });
+    lead.longNote = true;
+    S.leads.push(lead);
+    S.unlockedAt.safeguardLight = t;
+    queuePrompt('t5note');
+  }
+  if (t === 6 && once('t6delay')){
+    S.unlockedAt.collection = t;
+    const co = pickCo(c=>!c.main) || pickCo();
+    if (co){ enterDelay(co, null); queuePrompt('t6delay', { name: co.name }); }
+  }
+  if (t === 8 && once('t8out')){ S.unlockedAt.safeguardHeavy = t; queuePrompt('t8outsource'); }
+  if (t === 9 && once('t9key')){
+    const co = makeLead({ name:'丸源建設株式会社', industry:'const', order:480, score:57, room:2,
+                          terms:{closing:30,mo:2,day:30,method:'note',noteRatio:1.0,noteDays:60} });
+    co.key9 = true;
+    co.note = '保全がすべて開放された最初のターンの契約。ここで何を取ったかが第18ターンの答え合わせになる。';
+    S.leads.push(co);
+    log('【重要】丸源建設からの引合い。保全条件がすべて開放された最初のターンである。','warn');
+  }
+  if (t === 10 && once('t10')) queuePrompt('t10law');
+  if (t === 11 && once('t11')) queuePrompt('t11rebate');
+  if (t === 12 && once('t12')){ S.unlockedAt.finance = t; log('決算期。ファクタリング・手形割引・借入が使えるようになった。','info'); }
+  if (t === 15 && once('t15')){ raiseCost(0.10, '仕入価格が高騰した'); queuePrompt('t15cost'); }
+  if (t === 16 && once('t16')){
+    const co = S.companies.find(c=>c.key9 && c.active && c.status==='normal');
+    if (co){ enterDelay(co, null); co.delayStartTurn = t; }
+  }
+  if (t === 18 && once('t18')){
+    const co = S.companies.find(c=>c.key9 && c.active);
+    if (co && co.status !== 'closed'){
+      co.status = 'longdelay'; co.delayTurns = 2; if (co.score!==null) co.score = Math.max(0, co.score-12);
+      co.stock = co.stock || { amount: co.order, deliveredTurn:t-2, resaleTurn: t-1 };
+      log('⚠⚠ 丸源建設が長期遅延に。第9ターンの契約で何を取ったかで、いま打てる手が変わる。回収画面を開くこと。','bad');
+      queuePrompt('t18long', { coId: co.id });
+    }
+  }
+  if (t === 20 && once('t20')){
+    const co = mainCo();
+    if (co){ co.score = 48; co.scoreDropped = true; co.scoreDropTurn = t;
+      queuePrompt('t20drop', { name: co.name }); }
+  }
+  if (t === 22 && once('t22')) queuePrompt('t22bank');
+  if (t === 23 && once('t23')){
+    const co = pickCo(c=>Object.keys(c.safeguards).length===0 && !c.main) || pickCo(c=>!c.main);
+    if (co) queuePrompt('jump', { coId: co.id });
+  }
+  if (t === 24 && once('t24')) queuePrompt('t24paper');
+  if (t === 26 && once('t26')){
+    const key = pick(Object.keys(INDUSTRIES));
+    S.companies.forEach(c=>{ if (c.industry===key && c.active) c.order = Math.round(c.order*0.8); });
+    queuePrompt('t26market', { label: INDUSTRIES[key].label });
+  }
+  if (t === 27 && once('t27')){
+    const co = pickCo(c=>!c.main);
+    if (co){
+      co.stock = { amount: Math.max(co.order, 200), deliveredTurn:t, resaleTurn: t+1 };
+      S.receivables.push({ id:'r27', coId:co.id, amount:co.stock.amount, kind:'ar', dueTurn:t+2, born:t, settled:false });
+      enterLegal(co, '事業停止');
+      queuePrompt('t27stop', { coId: co.id });
+    }
+  }
+  if (t === 28 && once('t28')){
+    const co = mainCo();
+    if (co && co.status === 'normal'){ enterDelay(co, null); co.delayStartTurn = t; co.status = 'longdelay'; co.delayTurns = 2;
+      log('⚠⚠ 主要取引先が長期遅延に入った。交渉余地は0になり、もう何も取れない。','bad'); }
+  }
+  if (t === 30 && once('t30')){
+    const co = mainCo();
+    if (co && co.status !== 'closed' && co.active){
+      enterLegal(co, null);
+      queuePrompt('t30legal', { coId: co.id, kind: co.legalKind, amount: co.claim });
+    }
+  }
+  if (t === 31 && once('t31')){
+    const co = pickCo(c=>Object.keys(c.safeguards).length>0);
+    if (co) queuePrompt('jump', { coId: co.id });
+  }
+  if (t === 32 && once('t32')) raiseCost(0.08, '仕入価格の上昇がピークに達した');
+  if (t === 34 && once('t34')){
+    S.leads.push(makeLead({ name:'株式会社北関東マテリアル', industry:'mfg', order:640, score:61 }));
+    queuePrompt('t34last');
+  }
+}
+
+/* ---- 罠（§7.3） ---- */
+function fireTraps(){
+  for (const tp of S.trapPlan){
+    if (!tp.introduced && S.turn === tp.introTurn){
+      tp.introduced = true;
+      if (tp.kind === 'fraud'){
+        const co = makeLead({ name:'株式会社ミツバ物流サービス', industry:'retail', order:40, score:50, trap:'fraud', room:3 });
+        co.neverDelay = true;
+        S.leads.push(co); tp.coId = co.id;
+        log('小口（月40万円）の新規の引合いがあった。','');
+      } else if (tp.kind === 'antisocial'){
+        const co = makeLead({ name:'株式会社アカツキ商会', industry:'retail', order:600, score:68, trap:'antisocial', room:3,
+                              terms:{closing:10,mo:0,day:30,method:'cash',noteRatio:0,noteDays:0} });
+        co.neverDelay = true;
+        S.leads.push(co); tp.coId = co.id;
+        log('条件が非常に良い引合いがあった（月600万円・10日締め当月末払い＝20日サイト）。話がうますぎるほど良い。','');
+      } else if (tp.kind === 'notedrawer'){
+        const co = S.companies.find(c=>c.active && (c.terms.noteRatio||0) > 0);
+        if (co) tp.coId = co.id; else tp.done = true;
+      }
+    }
+    if (!tp.done && tp.introduced && S.turn === tp.mainTurn){
+      if (tp.kind === 'fraud'){
+        const co = S.companies.find(c=>c.id===tp.coId && c.active);
+        if (co){ co.order = 2000; co.wantsLimit = 2000;
+          co.terms = { closing:30, mo:2, day:30, method:'cash', noteRatio:0, noteDays:0 };
+          queuePrompt('fraudMain', { coId: co.id }); tp.done = true; tp.armed = true; tp.burstTurn = S.turn + 2; }
+        else tp.done = true;
+      } else if (tp.kind === 'circular'){
+        queuePrompt('circularMain'); tp.done = true;
+      } else if (tp.kind === 'antisocial'){
+        const co = S.companies.find(c=>c.id===tp.coId && c.active);
+        if (co && !co.creditChecked){
+          S.companies.forEach(c=>{ if (c.active) c.order = Math.round(c.order*0.85); });
+          queuePrompt('antisocialPenalty', { name: co.name });
+          co.active = false; co.order = 0;
+        }
+        tp.done = true;
+      } else if (tp.kind === 'notedrawer'){
+        const co = S.companies.find(c=>c.id===tp.coId && c.active);
+        const amt = co ? S.receivables.filter(r=>r.coId===co.id && !r.settled && r.kind==='note').reduce((a,r)=>a+r.amount,0) : 0;
+        if (co && amt > 0) queuePrompt('noteDrawer', { coId: co.id, name: co.name, amount: amt });
+        tp.done = true;
+      }
+    }
+    // 罠の破裂
+    if (tp.burstTurn && S.turn === tp.burstTurn){
+      if (tp.kind === 'fraud'){
+        const co = S.companies.find(c=>c.id===tp.coId && c.active);
+        if (co && outstanding(co) > 0){
+          enterLegal(co, '事業停止'); co.resolveTurn = S.turn + 1;
+          log('★ ' + co.name + ' と連絡が取れなくなった。事務所はもぬけの殻である。','bad');
+        }
+      } else if (tp.kind === 'circular'){
+        const co = S.companies.find(c=>c.id===tp.coId && c.active);
+        if (co){
+          enterLegal(co, '連鎖の破綻'); co.resolveTurn = S.turn + 1;
+          S.reputationPenalty = 1;
+          log('★ 循環が破綻した。伝票を通していた取引は架空であり、売掛金は回収できない。加えて信用が失墜し、全取引先の交渉余地が1減った。','bad');
+        }
+      }
+      tp.burstTurn = null;
+    }
+  }
+}
+
+/** 仕入原価の上昇。上昇分の4割は自然に売価へ乗るが、残りは価格転嫁を交渉しないと粗利が消える */
+function raiseCost(up, msg){
+  const cap = 1.35;
+  const before = S.costIdx;
+  S.costIdx = Math.min(cap, S.costIdx * (1+up));
+  const eff = S.costIdx/before - 1;
+  S.companies.forEach(c=>{ c.priceIdx *= (1 + eff*0.5); });
+  log(msg + '（+' + pct(eff,0) + '／原価指数 ' + (S.costIdx*100).toFixed(0) +
+      '）。半分は自然に売価へ乗ったが、残りは価格転嫁を交渉しないと粗利が消える。','warn');
+}
+
+/* ---- ランダムイベント（§7.2） ---- */
+function phaseRandomEvents(rep){
+  const R = CFG.rnd;
+  for (const co of S.companies){
+    if (!co.active || co.status !== 'normal') continue;
+    if (co.orderDown){ if (chance(R.orderRecover)){ co.order = co.baseOrder; co.orderDown = false;
+      log(co.name + ' の発注が元の水準に戻った。','good'); } }
+    else if (chance(R.orderDown)){
+      const d = 0.10 + rnd()*0.20;
+      co.order = Math.round(co.order * (1-d)); co.orderDown = true;
+      log(co.name + ' の発注が ' + pct(d,0) + ' 減った。放っておくと売上は削れていく。','warn');
+    }
+    if (chance(R.termsChange)){
+      queuePrompt('termsChange', { coId: co.id });
+    }
+  }
+  if (chance(R.bigOrder)){
+    const co = pickCo();
+    if (co){
+      const amt = ri(200, 600);
+      if (S.inventory >= amt * (1-marginOf(co))){
+        S.inventory -= amt * (1-marginOf(co));
+        S.receivables.push({ id:'b'+S.turn, coId:co.id, amount:amt, kind:'ar', dueTurn:S.turn+dueOffset(co.terms), born:S.turn, settled:false });
+        rep.sales += amt; rep.gross += amt*marginOf(co); S.stats.sales += amt; S.yearSales += amt;
+        log('◎ ' + co.name + ' から「今週中に欲しい」という突発の大口注文（' + man(amt) + '）。在庫があったので受けられた。','good');
+      } else {
+        log('✕ ' + co.name + ' から突発の大口注文（' + man(amt) + '）。在庫がなく失注した。','warn');
+        giveCard('inventory-is-cash');
+      }
+    }
+  }
+  const invCap = expectedCogs() * 0.9;
+  if (S.inventory > invCap && chance(R.spoil)){
+    const loss = S.inventory * (0.05 + rnd()*0.10);
+    S.inventory -= loss; S.equity -= loss; rep.spoil = loss;
+    log('在庫が積み上がり、賞味期限切れで ' + man(loss) + ' を廃棄した。在庫は現金が形を変えたものである。','bad');
+    giveCard('inventory-is-cash');
+  }
+  if (chance(R.costUp)) raiseCost(0.04 + rnd()*0.06, '仕入価格が上昇した');
+  if (S.turn >= 25 && S.flags.paperNoteEnd){
+    const cand = S.companies.filter(c=>c.active && c.status==='normal' && (c.terms.noteRatio||0)>0 && !c.refusesDenki);
+    if (cand.length && chance(0.5)){
+      const co = pick(cand); co.refusesDenki = true; co.denkiDeadline = S.turn + 2;
+      queuePrompt('denkiRefuse', { name: co.name, coId: co.id });
+    }
+  }
+  for (const co of S.companies){
+    if (co.refusesDenki && co.denkiDeadline && S.turn >= co.denkiDeadline){
+      co.active = false; co.order = 0;
+      log('✕ ' + co.name + ' との取引が止まった（電子記録債権への移行に合意できなかった）。','bad');
+      co.refusesDenki = false;
+    }
+  }
+  if (unlocked('finance') && chance(R.loanOffer)) log('銀行から借入の打診があった（資金繰り画面から実行できる）。','');
+  // 訴訟の完了
+  for (const co of S.companies){
+    if (co.lawsuitTurn && S.turn >= co.lawsuitTurn && !co.title){
+      co.title = true; co.lawsuitTurn = null;
+      log('◎ ' + co.name + ' に対する債務名義を取得した。差押えに進める。','good');
+    }
+  }
+}
+PROMPTS.termsChange = {
+  title:'支払条件の変更要請',
+  body:(p)=>{
+    const co = findCo(p.coId);
+    return `<b>${esc(co?co.name:'')}</b> から「支払サイトを30日延ばしてほしい」という申し入れがあった。<br><br>
+      これは<b>資金が苦しいという申告に近い</b>。応じれば以後の遅延確率は1.5倍になり、信用スコアも下がる。断れば発注が減るかもしれない。`;
+  },
+  options:[
+    { label:'応じる', run:(p)=>{ const co = findCo(p.coId); if (!co) return;
+        co.terms.mo += 1; co.termsChanged = true; if (co.score!==null) co.score -= 3;
+        log(co.name + ' の条件変更に応じた。実効サイトは ' + effectiveMonths(co.terms).toFixed(2) + 'ヶ月になり、遅延確率は1.5倍になった。','warn');
+        giveCard('terms-change-signal'); } },
+    { label:'断る', run:(p)=>{ const co = findCo(p.coId); if (!co) return;
+        if (chance(0.4)){ co.order = Math.round(co.order*0.85); log(co.name + ' は条件変更を断られ、発注を15%減らした。','warn'); }
+        else log(co.name + ' の条件変更を断った。取引は続いている。','good');
+        giveCard('terms-change-signal'); } },
+  ],
+};
+
+PROMPTS.t18long = {
+  title:'第18ターン ―― 丸源建設が長期遅延に',
+  body:(p)=>{
+    const co = findCo(p.coId);
+    const sgs = co ? Object.keys(co.safeguards).map(sgLabel) : [];
+    return `<b>${esc(co?co.name:'丸源建設')}</b> の遅延が2ヶ月続き、長期遅延になった。売掛 ${man(co?outstanding(co):0)}。<br><br>
+      第9ターンの契約であなたが取ったもの: <b>${sgs.length?sgs.join('・'):'なし'}</b><br><br>
+      ここから先は、<b>あの時に取ったものしか使えない</b>。回収画面を開くと、使えない手段には「いつまでなら取れたか」が表示される。
+      他の債権者も動き始めており、先取特権と相殺は時間との勝負である。`;
+  },
+  options:[{ label:'回収画面を開く', run:(p)=>{ V.modal = { kind:'collect', coId:p.coId }; } }],
+};
+
+/* =========================================================================
+   画面
+   ========================================================================= */
+let V = { tab:'home', modal:null, dlg:null, sort:'ar' };
+const $ = (id)=>document.getElementById(id);
+
+function badDebtRate(){ return S.stats.badDebtNet / Math.max(1, S.stats.sales); }
+function arTotal(){ return S.receivables.filter(r=>!r.settled && r.kind==='ar').reduce((a,r)=>a+r.amount,0); }
+function noteTotal(){ return S.receivables.filter(r=>!r.settled && r.kind==='note').reduce((a,r)=>a+r.amount,0); }
+function overdueTotal(){
+  return S.receivables.filter(r=>{ const co = findCo(r.coId); return !r.settled && co && co.status!=='normal'; })
+                      .reduce((a,r)=>a+r.amount,0);
+}
+function monthlySales(){ return expectedSales(); }
+function avgMargin(){
+  const l = S.companies.filter(c=>c.active);
+  const t = l.reduce((a,c)=>a+c.order,0);
+  if (!t) return CFG.init.grossMargin;
+  return l.reduce((a,c)=>a+c.order*marginOf(c),0)/t;
+}
+function troubleList(){ return S.companies.filter(c=>c.active && inTrouble(c)); }
+
+function render(){
+  if (!S) return;
+  const frame = totalFrame(), used = frameUsed(), rate = used/Math.max(1,frame);
+  const net = S.stats.badDebtNet, nr = badDebtRate();
+  const barCls = rate > 1 ? 'over' : rate > 0.9 ? 'near' : '';
+  const trouble = troubleList();
+
+  let html = '';
+  html += `<div class="spread" style="margin-bottom:10px">
+    <div><h1>掛売り三年 <span class="muted small">― 株式会社カケウリ商事</span></h1>
+      <div class="small muted">第 ${S.turn} ターン / ${CFG.turns}（${ym(S.turn)}）　用語帳 ${cardCount()}/${CARDS.length}</div></div>
+    <div class="row">
+      <button class="tiny" onclick="ui.theme()">◐ テーマ</button>
+      <button class="tiny" onclick="ui.save()">保存</button>
+      <button class="tiny" onclick="ui.load()">読込</button>
+      <button class="tiny" onclick="ui.reset()">最初から</button>
+    </div></div>`;
+
+  // ---- KPI（§9.1） ----
+  html += `<div class="panel"><div class="kpi">
+      <div>現金 <b class="${S.cash<800?'bad':''}">${man(S.cash)}</b></div>
+      <div>自己資本 <b>${man(S.equity)}</b></div>
+      <div>月商 <b>${man(monthlySales())}</b></div>
+      <div>在庫 <b class="muted">${man(S.inventory)}</b><span class="tiny muted">（現金ではない）</span></div>
+      <div>粗利率 <b class="${avgMargin()<0.12?'bad':avgMargin()<0.145?'warn':''}">${pct(avgMargin())}</b>
+        <span class="tiny muted">（固定費を賄うには約${pct(Math.min(0.99,(S.fixedCost+S.employees*CFG.employeeCost)/Math.max(1,expectedSales())))}必要）</span></div>
+      <div>原価指数 <b class="${S.costIdx>1.05?'warn':''}">${(S.costIdx*100).toFixed(0)}</b></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <span class="small">総与信枠 ${fmt(used)} / ${fmt(frame)}万円</span>
+      <span class="bar"><i class="${barCls}" style="width:${Math.min(100,rate*100)}%"></i></span>
+      <span class="small mono">${pct(rate,0)}</span>
+      <span class="small muted">空き ${man(Math.max(0,frame-used))}</span>
+    </div>
+    <div class="small" style="margin-top:6px">
+      売掛残高 ${man(arTotal())}（うち遅延・法的整理 <span class="${overdueTotal()>0?'bad':''}">${man(overdueTotal())}</span>）
+      ／ 手形残高 ${man(noteTotal())}
+    </div>
+    <div class="small" style="margin-top:6px">★ 焦げ付き純損失 <b class="${net>CFG.win.goodAmt?'bad':net>CFG.win.excellentAmt?'warn':'good'}">${man(net)}</b>
+      （累計売上 ${fmt(S.stats.sales)}万の ${pct(nr,2)}）
+      <span class="muted">｜ 優: 1,500万かつ1.0%以内 ／ 良: 3,500万かつ2.5%以内</span></div>
+  </div>`;
+
+  if (S.tabHint) html += S.tabHint;
+
+  // ---- 対応が必要な案件 ----
+  html += `<div class="panel"><div class="spread"><h2>⚠ 対応が必要な案件 ${trouble.length}件</h2>
+      <div class="small">アクション枠 <b>${slotsLeft()}</b> / ${slotsTotal()}</div></div>`;
+  if (!trouble.length) html += `<div class="small muted">現在、遅延している取引先はない。</div>`;
+  for (const co of trouble){
+    const st = { delay:'遅延', longdelay:'長期遅延', legal:(co.legalKind||'法的整理') }[co.status];
+    const sgs = Object.keys(co.safeguards).map(sgLabel).join('・') || 'なし';
+    html += `<div class="spread" style="border-top:1px solid var(--line);padding:5px 0">
+      <div class="small">${esc(co.name)} <span class="chip bad">${st}${co.status==='longdelay'?co.delayTurns+'ヶ月目':''}</span>
+        売掛 ${man(outstanding(co))} ／ 保全: ${esc(sgs)}
+        ${co.status==='legal' ? `<span class="chip warn">配当確定まで ${Math.max(0,co.resolveTurn-S.turn)}ターン</span>`:''}</div>
+      <button class="tiny" onclick="ui.collect(${co.id})">対応する</button></div>`;
+  }
+  if (S.legacy.alive){
+    html += `<div class="spread" style="border-top:1px solid var(--line);padding:5px 0">
+      <div class="small">先代が放置した売掛金 ${man(S.legacy.amount)}
+        <span class="chip warn">第${S.legacy.deadline}ターンに時効</span></div>
+      <button class="tiny" onclick="ui.legacy()">対応する</button></div>`;
+  }
+  html += `</div>`;
+
+  // ---- 引合い ----
+  html += `<div class="panel"><h2>📩 今月の引合い ${S.leads.length}件</h2>`;
+  if (!S.leads.length) html += `<div class="small muted">今月は打診がなかった。</div>`;
+  for (const co of S.leads){
+    html += `<div class="spread" style="border-top:1px solid var(--line);padding:5px 0">
+      <div class="small">${esc(co.name)} <span class="chip">${INDUSTRIES[co.industry].label}</span>
+        月${fmt(co.order)}万 ／ ${esc(termsLabel(co.terms))} ／ スコア ${co.score===null?'<span class="warn">なし（決算書の開示なし）</span>':co.score}
+        ${co.suspicious&&co.registryChecked?'<span class="chip warn">登記に不自然さ</span>':''}</div>
+      <div class="row">
+        <button class="tiny" onclick="ui.survey(${co.id},'registry')">登記確認</button>
+        <button class="tiny" onclick="ui.survey(${co.id},'credit')">信用調査</button>
+        <button class="tiny primary" onclick="ui.credit(${co.id})">与信判断</button></div></div>`;
+  }
+  html += `</div>`;
+
+  // ---- タブ ----
+  html += `<div class="tabs">
+    ${['home:ダッシュボード','companies:取引先一覧','cash:資金繰り','buy:仕入設定','cards:用語帳']
+      .map(s=>{ const [k,l]=s.split(':'); return `<button class="${V.tab===k?'on':''}" onclick="ui.tab('${k}')">${l}</button>`; }).join('')}
+  </div>`;
+  html += `<div class="panel">${tabBody()}</div>`;
+
+  // ---- ターンを終える ----
+  html += `<div class="spread panel">
+    <div class="small muted">④入金・遅延判定 → ③出荷 → ⑥コスト → ⑦イベント の順に処理される（当月の入金を確認してから出荷する）。<br>
+      与信判断とアクションは、ターンを終える前に済ませること。</div>
+    <button class="primary" onclick="ui.endTurn()">ターンを終える ▶</button></div>`;
+
+  // ---- ログ ----
+  html += `<div class="panel"><h3>記録</h3><div class="log">` +
+    S.log.slice(0,60).map(l=>`<div class="${l.kind==='bad'?'bad':l.kind==='good'?'good':l.kind==='warn'?'warn':''}">
+      <span class="muted tiny">T${l.turn}</span> ${esc(l.text)}</div>`).join('') + `</div></div>`;
+
+  $('app').innerHTML = html;
+  renderModal();
+}
+
+/* ---- タブの中身 ---- */
+function tabBody(){
+  if (V.tab === 'companies') return tabCompanies();
+  if (V.tab === 'cash') return tabCash();
+  if (V.tab === 'buy') return tabBuy();
+  if (V.tab === 'cards') return tabCards();
+  return tabHome();
+}
+
+function tabHome(){
+  const rep = S.lastReport;
+  let h = `<h2>ダッシュボード</h2>`;
+  h += `<div class="grid2"><div>
+    <h3>先月の実績</h3>`;
+  if (!rep) h += `<div class="small muted">まだ1ターンも終えていない。</div>`;
+  else {
+    h += `<table><tbody>
+      <tr><td>売上</td><td class="num">${man(rep.sales)}</td></tr>
+      <tr><td>粗利</td><td class="num">${man(rep.gross)}（${pct(rep.gross/Math.max(1,rep.sales))}）</td></tr>
+      <tr><td>固定費</td><td class="num">-${man(rep.fixed)}</td></tr>
+      <tr><td>実費・手数料</td><td class="num">-${man(rep.expense)}</td></tr>
+      <tr><td>借入返済</td><td class="num">-${man(rep.loanPay)}</td></tr>
+      <tr><td class="b">営業利益</td><td class="num b ${rep.op<0?'bad':'good'}">${man(rep.op)}</td></tr>
+      <tr><td>入金</td><td class="num">${man(rep.cashIn)}</td></tr>
+      <tr><td>支払（仕入ほか）</td><td class="num">-${man(rep.cashOut)}</td></tr>
+    </tbody></table>`;
+    if (rep.blocked && rep.blocked.length)
+      h += `<div class="small warn" style="margin-top:6px">⚠ 限度額に達して出荷できなかった分: ` +
+           rep.blocked.map(b=>esc(b.name)+' '+man(b.lost)).join('／') + `</div>`;
+  }
+  h += `</div><div><h3>会社の状態</h3><table><tbody>
+    <tr><td>固定費（月）</td><td class="num">${man(S.fixedCost + S.employees*CFG.employeeCost)}</td></tr>
+    <tr><td>従業員（アクション枠）</td><td class="num">${S.employees}人 → 枠 ${slotsTotal()}</td></tr>
+    <tr><td>借入残高</td><td class="num">${man(S.loans.reduce((a,l)=>a+l.left,0))}</td></tr>
+    <tr><td>取引先</td><td class="num">${S.companies.filter(c=>c.active).length}社</td></tr>
+    <tr><td>断った取引の累計</td><td class="num">月${fmt(S.stats.refused)}万分</td></tr>
+    <tr><td>取った保全 / 取り逃した機会</td><td class="num">${S.stats.safeguardsTaken} / ${S.stats.safeguardMissed}</td></tr>
+    </tbody></table>
+    <div class="row" style="margin-top:8px">
+      <button class="tiny" onclick="ui.hire()" ${slotsLeft()<=0?'disabled':''}>従業員を増やす（枠+1／固定費+30万）</button>
+      <button class="tiny" onclick="ui.bulkPrice()" ${slotsLeft()<=0?'disabled':''}>全取引先に価格改定を通告する（枠1）</button>
+    </div>
+    <div class="tiny muted">価格改定: 7割が受け入れて売価が原価指数に追いつく。飲まない相手は発注を5%減らす。
+      個別の「価格転嫁を交渉する」（成功60%）より速いが、粗い。</div></div></div>`;
+  h += siteCalcHtml();
+  return h;
+}
+
+/* §4.1 支払サイト早見表（ガード条件を式より先に判定する） */
+function siteCalcHtml(){
+  const c = V.calc || (V.calc = { closing:30, mo:1, day:30 });
+  const t = { closing:c.closing, mo:c.mo, day:c.day, method:'cash', noteRatio:0, noteDays:0 };
+  const opt = (v,cur,label)=>`<option value="${v}" ${v==cur?'selected':''}>${label}</option>`;
+  let h = `<div class="hr"></div><h3>支払サイト早見表</h3>
+    <div class="small muted">「いつまでの取引分を／いつ払うか」。1ヶ月を30日として概算するのが実務の慣行である。</div>
+    <div class="row" style="margin-top:6px">
+      <select onchange="ui.calc('closing',this.value)">
+        ${[30,25,20,10].map(v=>opt(v,c.closing,(v===30?'末':v+'日')+'締め')).join('')}</select>
+      <select onchange="ui.calc('mo',this.value)">
+        ${[0,1,2].map(v=>opt(v,c.mo,['当月','翌月','翌々月'][v])).join('')}</select>
+      <select onchange="ui.calc('day',this.value)">
+        ${[30,25,20,10,5].map(v=>opt(v,c.day,(v===30?'末':v+'日')+'払い')).join('')}</select>
+    </div>`;
+  if (!termsValid(t)){
+    h += `<div class="calc bad">この組み合わせは成立しない。
+${c.mo===0 && c.day===c.closing ? '締め日と支払日が同じ日である（同日締め同日払い）。' : '締める前に払うことになる（支払月＝当月で、支払日が締め日より前）。'}
+式は無効な組み合わせでも数値を返してしまうので、式より先にガード条件を判定する。</div>`;
+    if (!S.cards['terms-guard']) giveCard('terms-guard');
+  } else {
+    h += `<div class="calc">${termsLabel(t).replace('／現金','')}
+支払サイト = ${siteFormula(t)}  → 売掛期間 ${arMonths(t).toFixed(2)}ヶ月
+限度額 1,000万円なら 月 ${fmt(1000/arMonths(t))}万円まで出荷できる（限度額 ÷ 実効サイト）
+手形サイト60日が付くと 実効 ${(arMonths(t)+2).toFixed(2)}ヶ月 → 月 ${fmt(1000/(arMonths(t)+2))}万円まで
+（同じ枠で売れる量が ${pct(1-arMonths(t)/(arMonths(t)+2),0)} 減る）</div>`;
+  }
+  return h;
+}
+
+function tabCompanies(){
+  const list = S.companies.filter(c=>c.active).slice().sort((a,b)=>outstanding(b)-outstanding(a));
+  const total = list.reduce((a,c)=>a+c.order,0) || 1;
+  let h = `<div class="spread"><h2>取引先一覧（${list.length}社）</h2>
+    <div class="small muted">🔄 = 仕入先も兼ねる（相殺できる）</div></div><div class="scroll"><table>
+    <thead><tr><th>社名</th><th>業種</th><th class="num">ｽｺｱ</th><th class="num">限度額</th><th class="num">売掛残高</th>
+    <th class="num">枠の遊び</th><th>保全</th><th>状態</th><th></th></tr></thead><tbody>`;
+  const warns = [];
+  for (const co of list){
+    const cap = perCompanyCap(co), out = outstanding(co);
+    const over = co.limit > cap;
+    if (over) warns.push(`${co.name}: 格付「${ratingOf(co).key}」の上限 ${man(cap)} を超過（${co.startTurn<=0?'経過措置・増額不可':'スコア下落により超過'}）`);
+    const sgs = Object.keys(co.safeguards).map(sgLabel).join('・');
+    const st = { normal:'', delay:'<span class="chip bad">遅延</span>',
+                 longdelay:'<span class="chip bad">長期遅延</span>', legal:'<span class="chip bad">法的整理</span>' }[co.status];
+    h += `<tr>
+      <td>${esc(co.name)}${co.isSupplier?' 🔄':''}${co.main?' <span class="chip">主力</span>':''}</td>
+      <td>${INDUSTRIES[co.industry].label}</td>
+      <td class="num">${co.score===null?'—':co.score}${co.scoreDropped?' <span class="bad">↓</span>':''}</td>
+      <td class="num">${co.prepay?'<span class="muted">前払</span>':fmt(co.limit)+(over?' <span class="bad">⚠</span>':'')}</td>
+      <td class="num">${fmt(out)}</td>
+      <td class="num">${co.prepay?'—':fmt(frameSlack(co))}</td>
+      <td class="small">${sgs?esc(sgs):'<span class="warn">なし</span>'}</td>
+      <td>${st}</td>
+      <td><button class="tiny" onclick="ui.manage(${co.id})">操作</button></td></tr>`;
+  }
+  h += `</tbody></table></div>`;
+  for (const w of warns) h += `<div class="small warn">⚠ ${esc(w)}</div>`;
+  const slack = list.reduce((a,c)=>a+frameSlack(c),0);
+  h += `<div class="small" style="margin-top:6px">総与信枠 ${fmt(frameUsed())} / ${fmt(totalFrame())}万円。
+    <b>剥がせる枠の合計 ${fmt(slack)}万円</b>（限度額 − 直近3ヶ月の最大残高）</div>`;
+  const shares = list.map(c=>({n:c.name, s:c.order/total})).sort((a,b)=>b.s-a.s).slice(0,3);
+  h += `<div class="small">売上シェア上位: ` + shares.map(s=>`${esc(s.n)} ${pct(s.s,0)}${s.s>0.25?' <span class="bad">⚠</span>':''}`).join('　') + `</div>`;
+  return h;
+}
+
+function cashForecast(){
+  const rows = [];
+  // これから出荷する分も織り込む。現存する売掛だけを並べると、毎ターン嘘の資金ショート予測が出る。
+  const plan = S.companies.filter(c=>c.active && c.status==='normal' && !c.prepay).map(c=>({
+    ship: Math.min(c.order, c.limit/effectiveMonths(c.terms)),
+    due: dueOffset(c.terms), note: noteOffset(c.terms), nr: (S.flags.paperNoteEnd ? 0 : (c.terms.noteRatio||0)),
+  }));
+  const prepay = S.companies.filter(c=>c.active && c.prepay).reduce((a,c)=>a+c.order,0);
+  for (let t = S.turn; t < S.turn + 4; t++){
+    let sure = 0, unsure = 0;
+    for (const r of S.receivables){
+      if (r.settled) continue;
+      const co = findCo(r.coId); if (!co) continue;
+      const when = r.kind === 'note' ? r.cashTurn : r.dueTurn;
+      const hit = (t === S.turn) ? (when <= t) : (when === t);
+      if (!hit) continue;
+      if (co.status === 'normal') sure += r.amount * (r.kind==='ar' ? (1-(co.terms.noteRatio||0)) : 1);
+      else unsure += r.amount;
+    }
+    for (const p of plan){                       // 今ターン以降の出荷から生じる入金
+      const shipTurn = t - p.due;
+      if (shipTurn >= S.turn && shipTurn <= S.turn + 3) sure += p.ship * (1 - p.nr);
+      const noteShip = t - p.due - p.note;
+      if (p.nr > 0 && noteShip >= S.turn && noteShip <= S.turn + 3) sure += p.ship * p.nr;
+    }
+    sure += prepay;
+    let out = S.payables.filter(p=>p.turn===t).reduce((a,p)=>a+p.amount,0);
+    if (t > S.turn) out += expectedCogs();        // 当月に発注する分の支払は翌月末
+    out += S.fixedCost + S.employees*CFG.employeeCost;
+    out += S.loans.reduce((a,l)=>a + (l.left>0 ? l.monthly + l.left*l.rate/12 : 0), 0);
+    rows.push({ t, sure, unsure, out });
+  }
+  return rows;
+}
+function tabCash(){
+  const rows = cashForecast();
+  let cash = S.cash;
+  let h = `<h2>資金繰り</h2><div class="small">現金 <b>${man(S.cash)}</b> ／ 在庫 <b>${man(S.inventory)}</b>
+    <span class="muted">（在庫は現金ではない。この数字が大きいほど現金が少ない）</span></div>
+    <div class="scroll"><table><thead><tr><th>ターン</th><th class="num">■確定の入金</th><th class="num">▨未確定（遅延中）</th>
+    <th class="num">支払予定</th><th class="num">差引</th><th class="num">現金残高の予測</th></tr></thead><tbody>`;
+  for (const r of rows){
+    const diff = r.sure - r.out; cash += diff;
+    h += `<tr><td>${r.t}${r.t===S.turn?'(今)':''}</td>
+      <td class="num">${fmt(r.sure)}</td>
+      <td class="num ${r.unsure>0?'warn':''}">${fmt(r.unsure)}</td>
+      <td class="num">-${fmt(r.out)}</td>
+      <td class="num ${diff<0?'bad':''}">${fmt(diff)}</td>
+      <td class="num ${cash<0?'bad':cash<500?'warn':''}">${fmt(cash)}${cash<0?' ← 資金ショート予測':''}</td></tr>`;
+  }
+  h += `</tbody></table></div>`;
+  if (!unlocked('finance')) return h + `<div class="small muted" style="margin-top:8px">ファクタリング・手形割引・借入は第${CFG.unlock.finance}ターンから使える。</div>`;
+
+  h += `<div class="hr"></div><h3>手当ての選択肢</h3>
+    <div class="small muted">ファクタリング手数料10%は、粗利率16%に対して<b>粗利の6割超</b>を吹き飛ばす。安易に使わないこと。
+    ⏰ 手数料は債権の残存サイトが長いほど安い ―― 早く動くほど安く済む。</div>`;
+  const fl = factorableList().sort((a,b)=>b.amount-a.amount).slice(0,6);
+  h += `<div class="scroll"><table><thead><tr><th>売掛債権</th><th class="num">金額</th><th class="num">入金予定</th>
+    <th class="num">手数料</th><th class="num">受取額</th><th></th></tr></thead><tbody>`;
+  for (const r of fl){
+    const co = findCo(r.coId); const fee = factoringFee(r);
+    h += `<tr><td>${esc(co?co.name:'')}</td><td class="num">${fmt(r.amount)}</td><td class="num">第${r.dueTurn}T</td>
+      <td class="num ${fee>=0.12?'bad':''}">${pct(fee,0)}</td><td class="num">${fmt(r.amount*(1-fee))}</td>
+      <td><button class="tiny" onclick="ui.factor('${r.id}')" ${slotsLeft()<=0?'disabled':''}>譲渡する</button></td></tr>`;
+  }
+  const notes = S.receivables.filter(r=>!r.settled && r.kind==='note');
+  for (const r of notes.slice(0,4)){
+    const co = findCo(r.coId); const remain = Math.max(0, r.cashTurn - S.turn); const fee = 0.005+0.01*remain;
+    h += `<tr><td>${esc(co?co.name:'')} <span class="chip">手形</span></td><td class="num">${fmt(r.amount)}</td>
+      <td class="num">第${r.cashTurn}T</td><td class="num">${pct(fee,1)}</td><td class="num">${fmt(r.amount*(1-fee))}</td>
+      <td><button class="tiny" onclick="ui.discount('${r.id}')" ${slotsLeft()<=0?'disabled':''}>割引する</button></td></tr>`;
+  }
+  h += `</tbody></table></div>
+    <div class="row" style="margin-top:8px">
+      <button class="tiny" onclick="ui.loan(1000)" ${slotsLeft()<=0?'disabled':''}>1,000万円を借り入れる（年3%・24回）</button>
+      <span class="small muted">返済が毎月の固定的な負担になる</span></div>`;
+  return h;
+}
+
+function tabBuy(){
+  let h = `<h2>仕入設定</h2><div class="small muted">在庫は現金が形を変えたものである。品目の管理はしない。</div>`;
+  h += `<h3 style="margin-top:10px">仕入方針</h3>`;
+  for (const k of Object.keys(CFG.purchasePolicies)){
+    const p = CFG.purchasePolicies[k];
+    h += `<div class="opt ${S.purchasePolicy===k?'sel':''}" onclick="ui.policy('${k}')">
+      <b>${p.label}</b>（発注 ×${p.mult.toFixed(2)}） <span class="small muted">${p.note}</span></div>`;
+  }
+  h += `<h3 style="margin-top:10px">仕入先</h3>`;
+  for (const k of Object.keys(CFG.supplierModes)){
+    const p = CFG.supplierModes[k];
+    h += `<div class="opt ${S.supplierMode===k?'sel':''}" onclick="ui.supplier('${k}')">
+      <b>${p.label}</b>（表示価格 ${p.displayMult?('×'+p.displayMult.toFixed(2)):'×'+p.priceMult.toFixed(2)}）
+      <span class="small muted">${p.note}</span></div>`;
+  }
+  h += `<div class="hr"></div><h3>仕入先に指定する取引先（相殺の盾）</h3>
+    <div class="small muted">危ない売り先から割高に仕入れるのは、保険料を払う行為である。指定は「売り先を兼ねる相手から」を選んでいるときに効く。</div>
+    <div class="scroll"><table><thead><tr><th>社名</th><th class="num">売掛残高</th><th class="num">買掛金</th><th></th></tr></thead><tbody>`;
+  for (const co of S.companies.filter(c=>c.active && !c.prepay)){
+    h += `<tr><td>${esc(co.name)}</td><td class="num">${fmt(outstanding(co))}</td><td class="num">${fmt(co.apBalance||0)}</td>
+      <td><button class="tiny ${co.isSupplier?'primary':''}" onclick="ui.toggleSup(${co.id})">${co.isSupplier?'指定中':'指定する'}</button></td></tr>`;
+  }
+  h += `</tbody></table></div>`;
+  return h;
+}
+
+function tabCards(){
+  let h = `<div class="spread"><h2>用語帳 ${cardCount()}/${CARDS.length}</h2></div><div class="row small">`;
+  for (const c of CARD_CATS){
+    const all = CARDS.filter(x=>x.cat===c), got = all.filter(x=>S.cards[x.id]);
+    h += `<span class="chip">${c} ${got.length}/${all.length}</span>`;
+  }
+  h += `</div><div class="hr"></div>`;
+  for (const c of CARDS){
+    if (S.cards[c.id]){
+      h += `<div class="card"><div class="spread"><div class="t">${esc(c.title)}</div>
+        <div><span class="chip">${c.cat}</span><span class="chip">${c.tier}</span></div></div>
+        <div class="small">${esc(c.body)}</div>
+        ${c.src?`<div class="s">出典: ${esc(c.src)}</div>`:''}</div>`;
+    } else {
+      h += `<div class="card locked"><div class="t">？？？</div><div class="small muted">${c.cat}</div></div>`;
+    }
+  }
+  return h;
+}
+
+/* =========================================================================
+   モーダル
+   ========================================================================= */
+function modal(inner, wide){
+  return `<div class="modal-bg"><div class="modal" style="${wide?'max-width:920px':''}">${inner}</div></div>`;
+}
+function renderModal(){
+  const root = $('modalRoot');
+  let html = '';
+  if (S.gameOver) html = modalGameOver();
+  else if (S.ending) html = modalEnding();
+  else if (S.pendingClosing) html = modalClosing();
+  else if (S.promptQueue && S.promptQueue.length) html = modalPrompt(S.promptQueue[0]);
+  else if (S.cardQueue && S.cardQueue.length) html = modalCard(S.cardQueue[0]);
+  else if (V.modal) html = modalCustom(V.modal);
+  root.innerHTML = html;
+}
+function modalPrompt(q){
+  const P = PROMPTS[q.id];
+  if (!P){ S.promptQueue.shift(); return ''; }
+  const title = typeof P.title === 'function' ? P.title(q.p) : P.title;
+  const body = typeof P.body === 'function' ? P.body(q.p) : P.body;
+  let h = `<h2>${esc(title)}</h2><div style="margin:10px 0">${body}</div>`;
+  h += P.options.map((o,i)=>`<div class="opt" onclick="ui.prompt(${i})"><b>${esc(o.label)}</b>
+    ${o.note?`<div class="small muted">${esc(o.note)}</div>`:''}</div>`).join('');
+  return modal(h);
+}
+function modalCard(id){
+  const c = CARDS.find(x=>x.id===id);
+  let h = `<div class="small muted">解説カードを獲得した（${c.cat}・${c.tier}）</div>
+    <h2 style="margin-top:6px">${esc(c.title)}</h2>
+    <div style="margin:10px 0">${esc(c.body)}</div>
+    ${c.src?`<div class="s small muted">出典: ${esc(c.src)}</div>`:''}
+    <div class="center" style="margin-top:12px"><button class="primary" onclick="ui.cardOk()">閉じる</button></div>`;
+  return modal(h);
+}
+function modalCustom(m){
+  if (m.kind === 'credit') return modalCredit(m);
+  if (m.kind === 'collect') return modalCollect(m);
+  if (m.kind === 'manage') return modalManage(m);
+  if (m.kind === 'renego') return modalRenego(m);
+  if (m.kind === 'report') return modalReport(m);
+  if (m.kind === 'legacy') return modalLegacy();
+  if (m.kind === 'msg') return modal(`<h2>${esc(m.title)}</h2><div>${m.body}</div>
+    <div class="center" style="margin-top:12px"><button class="primary" onclick="ui.close()">閉じる</button></div>`);
+  return '';
+}
+
+/* ---- §9.3 与信判断ダイアログ ---- */
+function dlgRoomText(co){
+  if (co.roomRange) return `${co.roomRange[0]}〜${co.roomRange[1]}（信用調査による推定）`;
+  if (co.roomLower !== null && co.roomLower !== undefined) return `${co.roomLower} 以上（登記確認による推定）`;
+  return '不明（登記確認で下限、信用調査でレンジが分かる。結果は翌ターン）';
+}
+function shipHintHtml(co, limit){
+  const am = arMonths(co.terms), em = effectiveMonths(co.terms);
+  const a = limit/am, b = limit/em;
+  let h = `<div class="small">現金払いなら（${am.toFixed(1)}ヶ月） → 月 <b>${fmt(a)}万円</b>まで出荷できます</div>`;
+  if (em > am + 0.01){
+    h += `<div class="small">一部手形込み（${em.toFixed(1)}ヶ月） → 月 <b>${fmt(b)}万円</b>まで
+      （希望額 ${fmt(co.order)}万の ${pct(b/co.order,0)}）<span class="warn">← 実際はこちら</span></div>`;
+  } else {
+    h += `<div class="small muted">希望額 ${fmt(co.order)}万の ${pct(b/co.order,0)} まで出荷できます</div>`;
+  }
+  const naive = S.equity * ({ '最上位':0.10,'上位':0.06,'中位':0.04,'下位':0.02,'要注意':0.01 }[ratingOf(co).key] || 0.01);
+  h += `<div class="tiny muted">参考: 教科書の自己資本比の目安なら ${fmt(naive)}万円（この目安を素朴に当てると商売が止まる ― 用語帳）</div>`;
+  return h;
+}
+function modalCredit(m){
+  const co = findCo(m.coId); if (!co) return '';
+  const d = V.dlg;
+  const cap = perCompanyCap(co), free = frameFree(), req = requiredLimit(co);
+  const maxLimit = Math.min(cap, free);
+  const reqPt = d.sg.reduce((a,k)=>a+CFG.safeguards.find(s=>s.key===k).pt, 0);
+  const room = currentRoom(co, true) + d.conc.length;
+  let h = `<h2>与信判断: ${esc(co.name)}（${INDUSTRIES[co.industry].label}）</h2>
+  <table><tbody>
+    <tr><td>希望取引額</td><td class="num">月 ${fmt(co.order)}万円</td></tr>
+    <tr><td>支払条件</td><td>${esc(termsLabel(co.terms))}</td></tr>
+    <tr><td>支払サイト</td><td class="mono">${siteFormula(co.terms)}${effectiveMonths(co.terms)>arMonths(co.terms)?
+      `<br>手形分を含む実効サイト（加重平均） <b>${effectiveMonths(co.terms).toFixed(2)}ヶ月</b>
+       ／ 手形分の現金化は最長 <b>${siteDays(co.terms)+(co.terms.noteDays||0)}日</b> ⚠`:''}</td></tr>
+    <tr><td>信用スコア</td><td>${co.score===null?'なし（決算書の開示なし）':co.score} → 格付「${ratingOf(co).key}」／1社上限 ${man(cap)}（総枠の${pct(ratingOf(co).pct,0)}）</td></tr>
+    <tr><td>仕入先を兼ねる</td><td>${co.isSupplier?'はい（相殺が使えます）':'いいえ（相殺は使えません）'}</td></tr>
+    ${co.registryChecked?`<tr><td>登記</td><td class="small">${co.registryFlags.map(esc).join('／')}</td></tr>`:''}
+  </tbody></table>
+  <div class="calc">参考: 与信限度額の目安
+  必要限度 = ${fmt(co.order)}万 × ${arMonths(co.terms).toFixed(2)}ヶ月${(co.terms.noteRatio||0)>0?` + ${fmt(co.order)}万 × ${co.terms.noteRatio} × ${((co.terms.noteDays||0)/30).toFixed(2)}ヶ月`:''} = ${fmt(req)}万円
+  格付上限 = 総与信枠 ${fmt(totalFrame())}万 × ${pct(ratingOf(co).pct,0)}(${ratingOf(co).key}) = ${fmt(cap)}万円
+  総枠の残り = ${fmt(free)}万円
+  → ${fmt(Math.min(req,maxLimit))}万円が上限（${req<maxLimit?'必要限度':(cap<free?'格付上限':'総枠の残り')}が最小）</div>`;
+
+  h += `<div class="opt sel" style="margin-top:10px"><b>● 掛で売る</b>　与信限度額
+    <input type="number" id="limIn" value="${d.limit}" min="0" max="${Math.max(0,maxLimit)}" step="10"
+      oninput="ui.dlgLimit(this.value)"> 万円
+    <span class="tiny muted">（上限 ${fmt(Math.max(0,maxLimit))}）</span>
+    <div id="shipHint" style="margin-top:4px">${shipHintHtml(co, d.limit)}</div></div>`;
+
+  h += `<div class="opt"><b>併せて交渉する保全</b>　交渉余地: ${esc(dlgRoomText(co))}
+    <div style="margin-top:6px">`;
+  for (const sg of CFG.safeguards){
+    const av = safeguardAvailable(sg);
+    h += `<label class="${av?'':'locked'}" style="display:block">
+      <input type="checkbox" ${d.sg.includes(sg.key)?'checked':''} ${av?'':'disabled'}
+        onchange="ui.dlgSg('${sg.key}')"> ${sg.label} <span class="chip">${sg.pt}pt</span>
+      ${av?'':`<span class="tiny muted">第${sg.tier==='light'?CFG.unlock.safeguardLight:CFG.unlock.safeguardHeavy}ターンから</span>`}
+      ${sg.key==='guarantor'&&d.sg.includes('guarantor')?`　極度額 <input type="number" value="${d.cap}" oninput="ui.dlgCap(this.value)"> 万円`:''}
+      </label>`;
+  }
+  h += `<div class="small" style="margin-top:4px">要求合計 <b>${reqPt}pt</b></div></div>`;
+
+  h += `<div class="opt"><b>差し出すもの（余地を広げる）</b><div style="margin-top:6px">`;
+  for (const c of CFG.concessions){
+    h += `<label style="display:block"><input type="checkbox" ${d.conc.includes(c.key)?'checked':''}
+      onchange="ui.dlgConc('${c.key}')"> ${c.label} <span class="chip">+1</span>
+      <span class="tiny muted">${c.note}</span></label>`;
+  }
+  h += `<div class="small" style="margin-top:4px">調整後の余地 <b>${room}</b>
+    ${reqPt<=room?'<span class="good">→ 成立見込み</span>':reqPt===room+1?'<span class="warn">→ 相手から対案が返るかもしれない</span>':'<span class="bad">→ 失注の見込み</span>'}
+    <span class="tiny muted">（余地の実数は隠しパラメータ。表示は推定である）</span></div></div>`;
+
+  if (d.counter){
+    h += `<div class="panel sub"><b>相手からの対案</b>: ${d.counter.map(sgLabel).join('・')} なら受ける、という返答があった。
+      <div class="row" style="margin-top:6px">
+        <button class="primary tiny" onclick="ui.dlgAcceptCounter()">対案を受け入れて契約する</button>
+        <button class="tiny" onclick="ui.dlgDropCounter()">受け入れない</button></div></div>`;
+  }
+
+  h += `<div class="spread" style="margin-top:12px">
+    <div class="row">
+      <button onclick="ui.dlgCash()">現金・前払いを要求（失注リスク 40%）</button>
+      <button onclick="ui.dlgRefuse()">断る</button></div>
+    <div class="row">
+      <button onclick="ui.close()">キャンセル</button>
+      <button class="primary" onclick="ui.dlgAccept()">決定</button></div></div>`;
+  return modal(h, true);
+}
+
+/* ---- §9.5 回収アクション画面 ---- */
+function baseRateText(co){
+  if (co.trap==='fraud'||co.trap==='circular') return '0%（この類型では回収手段が効かない）';
+  const keys = ['collateral','guarantor','notarial','retention','eol'];
+  for (const k of keys){
+    if (co.safeguards[k]){
+      const r = CFG.baseRecovery[k];
+      return pct(r[0],0) + '〜' + pct(r[1],0) + '（' + sgLabel(k) + '）';
+    }
+  }
+  return '0%〜10%（保全なし）';
+}
+function modalCollect(m){
+  const co = findCo(m.coId); if (!co) return '';
+  const st = { delay:'遅延', longdelay:'長期遅延 '+co.delayTurns+'ヶ月目', legal:(co.legalKind||'法的整理'), normal:'正常' }[co.status];
+  let h = `<h2>回収: ${esc(co.name)}（${INDUSTRIES[co.industry].label}）</h2>
+    <div class="small">売掛 <b>${man(outstanding(co))}</b>　${st}
+      ${co.status==='legal'?`　<span class="chip warn">配当確定まで ${Math.max(0,co.resolveTurn-S.turn)}ターン</span>`:''}</div>
+    <div class="small">保全: ${Object.keys(co.safeguards).map(sgLabel).join('・')||'<span class="warn">なし</span>'}
+      ／ 仕入先を兼ねる: ${co.isSupplier?'はい（買掛金 '+man(co.apBalance||0)+'）':'いいえ'}
+      ／ 納品物: ${!co.stock?'なし':stockAlive(co)?`<span class="good">残っている（第${co.stock.resaleTurn}ターンに転売される）</span>`:`<span class="bad">第${co.stock.resaleTurn}ターンに転売済み</span>`}</div>
+    <div class="small">基準回収率 <b>${baseRateText(co)}</b>
+      ${co.recoveryBonus?`＋ これまでの回収アクション <b>${pct(co.recoveryBonus,0)}</b>`:''}</div>
+    <div class="hr"></div>
+    <div class="spread"><h3>使える手段</h3><div class="small">アクション枠 残り ${slotsLeft()}</div></div>`;
+
+  const usable = COLLECT_ACTIONS.filter(a=>a.ok(co));
+  const unusable = COLLECT_ACTIONS.filter(a=>!a.ok(co));
+  if (!usable.length) h += `<div class="small bad">使える手段がありません。相手が存在しない、あるいは前提を何も満たしていません。</div>`;
+  for (const a of usable){
+    h += `<div class="spread" style="padding:4px 0;border-bottom:1px dotted var(--line)">
+      <div class="small">● ${esc(a.label)} <span class="muted">${a.cost?man(a.cost):'0円'}</span>
+        <span class="accent">${esc(a.effect)}</span></div>
+      <button class="tiny" onclick="ui.doCollect(${co.id},'${a.key}')" ${slotsLeft()<=0?'disabled':''}>実行</button></div>`;
+  }
+  h += `<div class="hr"></div><h3>使えない手段</h3>
+    <div class="tiny muted">クリックすると、なぜ使えないか・いつまでなら取れたかが分かる。</div>`;
+  for (const a of unusable){
+    const could = a.could ? a.could(co) : (a.key==='seizure'?[]:[]);
+    h += `<div style="padding:4px 0;border-bottom:1px dotted var(--line);cursor:pointer" onclick="ui.whyCard('${a.key}',${co.id})">
+      <div class="small">✕ ${esc(a.label)} <span class="muted">${esc(a.why(co))}</span></div>`;
+    for (const c of (could||[])) h += `<div class="tiny muted" style="padding-left:16px">（${esc(c)}）</div>`;
+    h += `</div>`;
+  }
+  h += `<div class="center" style="margin-top:12px"><button onclick="ui.close()">閉じる</button></div>`;
+  return modal(h, true);
+}
+
+/* ---- 取引先の操作 ---- */
+function modalManage(m){
+  const co = findCo(m.coId); if (!co) return '';
+  const cap = perCompanyCap(co);
+  let h = `<h2>${esc(co.name)}</h2>
+    <div class="small">${INDUSTRIES[co.industry].label}／${esc(termsLabel(co.terms))}／実効サイト ${effectiveMonths(co.terms).toFixed(2)}ヶ月
+      ／スコア ${co.score===null?'—':co.score}（${ratingOf(co).key}）／粗利率 ${pct(marginOf(co))}</div>
+    <div class="small">売掛残高 ${man(outstanding(co))}／枠の遊び ${man(frameSlack(co))}／1社上限 ${man(cap)}
+      ／交渉余地 ${esc(dlgRoomText(co))}</div>
+    <div class="small">保全: ${Object.keys(co.safeguards).map(k=>sgLabel(k)+`(第${co.safeguards[k].turn}T)`).join('・')||'なし'}
+      ${co.guarantorCap?`／極度額 ${man(co.guarantorCap)}`:(co.safeguards.guarantor?'／<span class="bad">極度額の定めなし</span>':'')}</div>
+    <div class="hr"></div>`;
+  if (!co.prepay){
+    h += `<div class="opt"><b>与信限度額</b>
+      <input type="number" id="mlim" value="${co.limit}" step="10"> 万円
+      <button class="tiny" onclick="ui.setLimit(${co.id})">変更する</button>
+      <div class="small">${shipHintHtml(co, co.limit)}</div>
+      ${co.limit>cap?`<div class="small warn">格付上限 ${man(cap)} を超えています。増額はできません（減額はいつでもできます）。</div>`:''}</div>`;
+  }
+  h += `<div class="opt"><b>アクション</b>（残り枠 ${slotsLeft()}）<div class="row" style="margin-top:6px">
+    <button class="tiny" onclick="ui.survey(${co.id},'registry')" ${slotsLeft()<=0?'disabled':''}>登記を確認する（${man(CFG.cost.registry)}）</button>
+    <button class="tiny" onclick="ui.survey(${co.id},'credit')" ${slotsLeft()<=0?'disabled':''}>信用調査を依頼する（${man(CFG.cost.credit)}）</button>
+    <button class="tiny" onclick="ui.onsite(${co.id})" ${slotsLeft()<=0?'disabled':''}>現物を確認する</button>
+    <button class="tiny" onclick="ui.renego(${co.id})" ${slotsLeft()<=0?'disabled':''}>保全条件を追加交渉する</button>
+    <button class="tiny" onclick="ui.passthru(${co.id})" ${slotsLeft()<=0?'disabled':''}>価格転嫁を交渉する</button>
+    ${co.refusesDenki?`<button class="tiny primary" onclick="ui.denki(${co.id})" ${slotsLeft()<=0?'disabled':''}>電子記録債権への移行を交渉する</button>`:''}
+    <button class="tiny ${co.isSupplier?'primary':''}" onclick="ui.toggleSup(${co.id})">仕入先に${co.isSupplier?'指定中':'指定する'}</button>
+    ${inTrouble(co)?`<button class="tiny primary" onclick="ui.collect(${co.id})">回収画面</button>`:''}
+    <button class="tiny danger" onclick="ui.stopTrade(${co.id})">取引を止める</button>
+    </div></div>
+    <div class="center" style="margin-top:10px"><button onclick="ui.close()">閉じる</button></div>`;
+  return modal(h, true);
+}
+
+function modalRenego(m){
+  const co = findCo(m.coId); if (!co) return '';
+  const d = V.dlg;
+  const reqPt = d.sg.reduce((a,k)=>a+CFG.safeguards.find(s=>s.key===k).pt,0);
+  const room = currentRoom(co,false) + d.conc.length;
+  let h = `<h2>保全条件の追加交渉: ${esc(co.name)}</h2>
+    <div class="small">取引開始後の交渉余地は「初期値 −1」、スコアが落ちた後は1に固定、遅延が起きた後は0になる。
+      現在の推定: ${esc(dlgRoomText(co))} → 調整後 <b>${room}</b></div><div class="hr"></div>`;
+  for (const sg of CFG.safeguards){
+    const av = safeguardAvailable(sg), has = !!co.safeguards[sg.key];
+    h += `<label class="${av&&!has?'':'locked'}" style="display:block">
+      <input type="checkbox" ${d.sg.includes(sg.key)?'checked':''} ${(av&&!has)?'':'disabled'} onchange="ui.dlgSg('${sg.key}')">
+      ${sg.label} <span class="chip">${sg.pt}pt</span>${has?' <span class="chip good">取得済み</span>':''}
+      ${av?'':`<span class="tiny muted">第${sg.tier==='light'?CFG.unlock.safeguardLight:CFG.unlock.safeguardHeavy}ターンから</span>`}
+      ${sg.key==='guarantor'&&d.sg.includes('guarantor')?`　極度額 <input type="number" value="${d.cap}" oninput="ui.dlgCap(this.value)"> 万円`:''}</label>`;
+  }
+  h += `<div class="small">要求合計 ${reqPt}pt</div><div class="hr"></div><b>差し出すもの</b>`;
+  for (const c of CFG.concessions){
+    h += `<label style="display:block"><input type="checkbox" ${d.conc.includes(c.key)?'checked':''} onchange="ui.dlgConc('${c.key}')">
+      ${c.label} <span class="chip">+1</span> <span class="tiny muted">${c.note}</span></label>`;
+  }
+  h += `<div class="spread" style="margin-top:12px"><button onclick="ui.close()">キャンセル</button>
+    <button class="primary" onclick="ui.doRenego(${co.id})">交渉する（アクション枠1）</button></div>`;
+  return modal(h, true);
+}
+
+function modalLegacy(){
+  const L = S.legacy;
+  let h = `<h2>先代が放置した売掛金 ${man(L.amount)}</h2>
+    <div>権利を行使できると知った時から5年で、債権は消滅する（民法166条）。この債権は<b>第${L.deadline}ターンに時効を迎える</b>。<br><br>
+    <b>催告は延命、承認は更新。</b>内容証明で催告すれば、そこから6ヶ月間は時効が完成しない（150条）。相手が債務を承認すれば、時効は振り出しに戻る（152条）。</div>
+    <div class="opt" onclick="ui.legacyDo('mail')"><b>内容証明で催告する</b>（アクション枠1・${man(CFG.cost.contentsMail)}）
+      <div class="small muted">時効の完成が6ヶ月猶予される（延命）</div></div>
+    <div class="opt" onclick="ui.legacyDo('ack')"><b>債務の承認を取り付ける</b>（アクション枠1）
+      <div class="small muted">時効が更新され、6割を分割で回収できる</div></div>
+    <div class="center" style="margin-top:10px"><button onclick="ui.close()">閉じる</button></div>`;
+  return modal(h);
+}
+
+function modalClosing(){
+  const C = S.pendingClosing;
+  const yr = CFG.closingTurns.indexOf(C.turn)+1;
+  let h = `<h2>第${yr}期 決算（第${C.turn}ターン）</h2>
+    <div class="small">営業利益 ${man(C.op)}／当期売上 ${man(C.sales)}</div>
+    <div class="hr"></div><b>貸倒損失の計上</b>
+    <div class="small muted">計上すれば納税額が減って現金が残るが、回収を諦める意思表示でもある。納税額 = max(0, 営業利益 − 貸倒計上額) × 30%。</div>`;
+  if (!C.candidates.length) h += `<div class="small muted">計上できる焦げ付きはない。</div>`;
+  for (const c of C.candidates){
+    h += `<label style="display:block"><input type="checkbox" class="woChk" value="${c.id}" checked> ${esc(c.name)} ${man(c.amount)}</label>`;
+  }
+  // §8.3 期末の3行振り返り
+  const use = S.stats.frameUseCnt ? S.stats.frameUseSum/S.stats.frameUseCnt : 0;
+  const list = S.companies.filter(c=>c.active);
+  const tot = list.reduce((a,c)=>a+c.order,0)||1;
+  const top = list.slice().sort((a,b)=>b.order-a.order)[0];
+  h += `<div class="hr"></div><div class="calc">今期あなたが取った保全: ${S.stats.safeguardsTaken}件 ／ 取り逃した機会: ${S.stats.safeguardMissed}件
+焦げ付き純損失: ${man(S.stats.badDebtNet)}（累計売上の ${pct(badDebtRate(),2)}）
+総与信枠の平均使用率: ${pct(use,0)} ／ うち上位1社に ${top?pct(top.order/tot,0):'—'}
+断った取引の累計額: 月${fmt(S.stats.refused)}万円分</div>
+    <div class="center" style="margin-top:12px"><button class="primary" onclick="ui.closing()">決算を確定する</button></div>`;
+  return modal(h, true);
+}
+
+function modalGameOver(){
+  const g = S.gameOver;
+  let h = `<h2 class="bad">倒産 ―― 第${g.turn}ターン（${ym(g.turn)}）</h2>
+    <div>現金が ${man(g.cash)} となり、支払いができなくなった。<b>${g.kind}</b>である。</div>
+    <div class="calc">累計売上 ${fmt(S.stats.sales)}万円
+焦げ付き純損失 ${fmt(S.stats.badDebtNet)}万円
+自己資本 ${fmt(S.equity)}万円 ／ 在庫 ${fmt(S.inventory)}万円（現金ではない）
+${g.kind==='黒字倒産'?'損益計算書は黒字だった。利益と現金は別物である。回収サイトと支払サイトのズレ、手形、在庫 ―― どれが効いたかを振り返ること。':'赤字が続いた。粗利率16%の商売では、原価の上昇を転嫁できないだけで利益は消える。'}</div>
+    <div class="center" style="margin-top:12px"><button class="primary" onclick="ui.reset()">最初からやり直す</button></div>`;
+  return modal(h, true);
+}
+
+function modalEnding(){
+  const e = S.ending;
+  let h = `<h2>${e.grade.key==='優'?'🏆':'🎉'} 第36ターン到達 ―― 評価「${e.grade.key}」${esc(e.grade.title)}</h2>
+    <div class="calc">焦げ付き純損失 ${fmt(e.net)}万円（累計売上 ${fmt(S.stats.sales)}万円の ${pct(e.rate,2)}）
+現金 ${fmt(e.cash)}万円 ／ 自己資本 ${fmt(e.equity)}万円（勝敗の判定には使わない）
+用語帳 ${cardCount()}/${CARDS.length}（勝利条件には含めない。独立した達成である）</div>`;
+
+  h += `<h3 style="margin-top:10px">各債権について「取引開始時に何を取っていたか」と「結果」</h3>`;
+  if (!S.resolutions.length) h += `<div class="small good">焦げ付いた債権はなかった。</div>`;
+  else {
+    h += `<div class="scroll"><table><thead><tr><th>取引先</th><th>取っていた保全</th><th class="num">債権</th>
+      <th class="num">回収</th><th class="num">焦げ付き</th><th>適用された基準</th></tr></thead><tbody>`;
+    for (const r of S.resolutions){
+      h += `<tr><td>${esc(r.name)}</td><td class="small">${r.safeguards.length?r.safeguards.map(sgLabel).join('・'):'<span class="warn">なし</span>'}</td>
+        <td class="num">${fmt(r.total)}</td><td class="num good">${fmt(r.recovered)}</td>
+        <td class="num bad">${fmt(r.loss)}</td><td class="small">${esc(r.base)}</td></tr>`;
+    }
+    h += `</tbody></table></div>`;
+  }
+  h += `<h3 style="margin-top:10px">回避した損失／過剰な慎重さのコスト</h3>
+    <div class="small">断った・調べて売らなかったことで回避した損失: <b class="good">${man(S.stats.avoidedLoss)}</b>
+      <span class="muted">（何も起きなかったことが成果である）</span></div>
+    <div class="small">断ったが健全だった相手の取引額: <b class="warn">月${fmt(S.stats.refusedHealthy)}万円分</b>
+      <span class="muted">（過剰な慎重さにもコストがある）</span></div>`;
+
+  const unused = COLLECT_ACTIONS.filter(a=>!S.stats.actionsUsed[a.key]);
+  h += `<h3 style="margin-top:10px">一度も使わなかった回収手段</h3><ul class="tight small">`;
+  for (const a of unused) h += `<li>${esc(a.label)} ― 使える状況を作るには: ${esc(a.effect)}</li>`;
+  h += `</ul>`;
+
+  const missing = CARDS.filter(c=>!S.cards[c.id]);
+  h += `<h3>獲得できなかったカード（${missing.length}枚）</h3><div class="small muted">${missing.map(c=>esc(c.title)).join('／')||'すべて獲得した'}</div>`;
+
+  const tips = [];
+  if (S.stats.safeguardsTaken < 3) tips.push('保全を取る回数が少なかった。新規契約のときが最も安く取れる ― 遅延が起きた後は交渉余地が0になる。');
+  if (S.stats.badDebtNet > CFG.win.excellentAmt) tips.push('焦げ付きの多くは、保全を取っていない相手で起きた。基準回収率0〜10%と70〜95%の差がそのまま損失になる。');
+  if (!S.stats.actionsUsed.offset) tips.push('相殺を一度も使わなかった。危ない売り先を仕入先にも指定しておけば、買掛金の範囲は確実に回収できた（仕入価格は3%高くなる）。');
+  if (S.stats.refusedHealthy > 1000) tips.push('断った相手の中に健全な会社が多かった。調査は「断る理由を探す作業」ではなく「兆候の意味を切り分ける判断」である。');
+  if (S.employees === 0) tips.push('人を増やさなかった。アクション枠3では、調べる相手も回収する相手も選べない。枠は固定費で買える。');
+  while (tips.length < 3) tips.push('総与信枠の配分はゼロサムである。発注が減った取引先から枠を剥がして、次の1社に回すこと。');
+  h += `<h3>次はこうしてみよう</h3><ul class="tight small">${tips.slice(0,3).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
+  h += `<div class="center" style="margin-top:12px"><button class="primary" onclick="ui.reset()">もう一度（罠の種類・対象・時期は変わる）</button></div>`;
+  return modal(h, true);
+}
+function modalReport(){ return ''; }
+
+/* =========================================================================
+   操作
+   ========================================================================= */
+const WHY_CARD = {
+  offset:'offset', repossess:'safeguard-timing', lien:'movables-lien',
+  claimGuarantor:'guaranty-max', enforceCollateral:'safeguard-timing',
+  seizure:'notarial-deed', proof:'bankruptcy-priority', notarialNow:'notarial-deed',
+  mail:'dunning-vs-demand', plan:'prescription', lawsuit:'seizure', dun:'dunning-vs-demand',
+};
+
+const ui = {
+  tab(k){ V.tab = k; render(); },
+  close(){ V.modal = null; V.dlg = null; render(); },
+  theme(){
+    const el = document.documentElement;
+    const cur = el.getAttribute('data-theme');
+    el.setAttribute('data-theme', cur === 'dark' ? 'light' : cur === 'light' ? 'auto' : 'dark');
+    try { localStorage.setItem('kakeuri.theme', el.getAttribute('data-theme')); } catch(e){}
+  },
+  prompt(i){
+    const q = S.promptQueue.shift();
+    const P = PROMPTS[q.id];
+    try { P.options[i].run(q.p); } catch(e){ console.error(e); }
+    render();
+  },
+  cardOk(){ S.cardQueue.shift(); render(); },
+
+  /* --- 引合い --- */
+  credit(id){
+    const co = findCo(id); if (!co) return;
+    const cap = perCompanyCap(co), free = frameFree();
+    const suggest = Math.min(Math.round(requiredLimit(co)/10)*10, cap, free);
+    V.dlg = { limit: Math.max(0, suggest), sg:[], conc:[], cap:'', counter:null };
+    V.modal = { kind:'credit', coId:id };
+    if (!S.cards['equity-textbook']) giveCard('equity-textbook');   // §6.4 第1ターンの最初の限度額入力で出す
+    render();
+  },
+  dlgLimit(v){
+    V.dlg.limit = Math.max(0, Math.round(Number(v)||0));
+    const co = findCo(V.modal.coId);
+    const el = $('shipHint'); if (el && co) el.innerHTML = shipHintHtml(co, V.dlg.limit);
+  },
+  dlgSg(k){
+    const d = V.dlg;
+    d.sg = d.sg.includes(k) ? d.sg.filter(x=>x!==k) : d.sg.concat([k]);
+    d.counter = null; render();
+  },
+  dlgConc(k){
+    const d = V.dlg;
+    d.conc = d.conc.includes(k) ? d.conc.filter(x=>x!==k) : d.conc.concat([k]);
+    d.counter = null; render();
+  },
+  dlgCap(v){ V.dlg.cap = v; },
+  dlgAccept(){
+    const co = findCo(V.modal.coId); const d = V.dlg;
+    const cap = perCompanyCap(co), free = frameFree();
+    if (d.limit > Math.min(cap, free)){
+      alert('限度額が上限を超えています。格付上限 ' + man(cap) + '／総枠の残り ' + man(free) +
+            '\n新規に枠を割り当てたいときは、取引先一覧で既存の限度額を減らして枠を空けてください。');
+      return;
+    }
+    if (d.sg.includes('guarantor') && !d.cap) giveCard('guaranty-max');   // 極度額を空欄のまま進める（警告は出さない）
+    const res = acceptLead(co, d.limit, d.sg, d.conc, Number(d.cap)||null);
+    if (res && res.counter && res.counter.length){ d.counter = res.counter; render(); return; }
+    V.modal = null; V.dlg = null; render();
+  },
+  dlgAcceptCounter(){
+    const co = findCo(V.modal.coId); const d = V.dlg;
+    const res = acceptLead(co, d.limit, d.counter, d.conc, Number(d.cap)||null);
+    V.modal = null; V.dlg = null; render();
+  },
+  dlgDropCounter(){ V.dlg.counter = null; render(); },
+  dlgCash(){ const co = findCo(V.modal.coId); requestCash(co); V.modal = null; V.dlg = null; render(); },
+  dlgRefuse(){ const co = findCo(V.modal.coId); refuseLead(co); V.modal = null; V.dlg = null; render(); },
+
+  /* --- 調査・交渉 --- */
+  survey(id, kind){ if (!runSurvey(id, kind)) alert('アクション枠が足りません。'); render(); },
+  onsite(id){ if (!runOnsite(id)) alert('アクション枠が足りません。'); render(); },
+  passthru(id){ if (!runPassthru(id)) alert('アクション枠が足りません。'); render(); },
+  denki(id){ if (!runDenki(id)) alert('アクション枠が足りません。'); render(); },
+  toggleSup(id){ toggleSupplier(id); render(); },
+  manage(id){ V.modal = { kind:'manage', coId:id }; render(); },
+  renego(id){ V.dlg = { sg:[], conc:[], cap:'' }; V.modal = { kind:'renego', coId:id }; render(); },
+  doRenego(id){
+    const d = V.dlg;
+    if (!d.sg.length){ alert('取りたい保全を選んでください。'); return; }
+    runRenego(id, d.sg, d.conc, Number(d.cap)||null);
+    V.modal = null; V.dlg = null; render();
+  },
+  setLimit(id){
+    const v = Math.max(0, Math.round(Number($('mlim').value)||0));
+    const r = setLimit(id, v);
+    if (!r.ok) alert(r.msg);
+    render();
+  },
+  stopTrade(id){
+    const co = findCo(id); if (!co) return;
+    if (!confirm(co.name + ' との取引を止めますか。売掛金の回収は続きますが、以後の出荷は止まります。')) return;
+    co.order = 0;
+    log(co.name + ' への出荷を止めた。','warn');
+    V.modal = null; render();
+  },
+
+  /* --- 回収 --- */
+  collect(id){ V.modal = { kind:'collect', coId:id }; render(); },
+  doCollect(id, key){ if (!runCollectAction(id, key)) alert('アクション枠が足りないか、前提を満たしていません。'); render(); },
+  whyCard(key, id){
+    const cid = WHY_CARD[key];
+    if (cid && !S.cards[cid]) { giveCard(cid); render(); }
+  },
+  legacy(){ V.modal = { kind:'legacy' }; render(); },
+  legacyDo(kind){
+    if (slotsLeft() <= 0){ alert('アクション枠が足りません。'); return; }
+    useSlot(); if (kind==='mail') spend(CFG.cost.contentsMail);
+    legacyAction(kind);
+    V.modal = null; render();
+  },
+
+  /* --- 資金 --- */
+  factor(rid){ if (!runFactoring(rid)) alert('アクション枠が足りません。'); render(); },
+  discount(rid){ if (!runDiscountNote(rid)) alert('アクション枠が足りません。'); render(); },
+  loan(a){ if (!runLoan(a)) alert('アクション枠が足りません。'); render(); },
+  hire(){ if (!runHire()) alert('アクション枠が足りません。'); render(); },
+  calc(k,v){ V.calc = V.calc || { closing:30, mo:1, day:30 }; V.calc[k] = Number(v); render(); },
+  bulkPrice(){ if (!runBulkPrice()) alert('アクション枠が足りません。'); render(); },
+  policy(k){ S.purchasePolicy = k; giveCard('inventory-is-cash'); render(); },
+  supplier(k){ S.supplierMode = k; if (k!=='normal') giveCard('supplier-choice'); render(); },
+
+  /* --- ターン --- */
+  endTurn(){
+    if (S.promptQueue && S.promptQueue.length){ alert('先に案内を読んでください。'); return; }
+    endTurn();
+    V.modal = null;
+    autoSave();
+    render();
+  },
+  closing(){
+    const ids = Array.from(document.querySelectorAll('.woChk')).filter(x=>x.checked).map(x=>Number(x.value));
+    applyClosing(ids);
+    render();
+  },
+
+  /* --- セーブ --- */
+  save(){ if (saveGame()) alert('保存しました。'); },
+  load(){ if (loadGame()){ V.modal = null; V.dlg = null; render(); alert('読み込みました。'); } else alert('保存データがありません。'); },
+  reset(){
+    if (!confirm('最初からやり直しますか。罠の種類・対象・発火ターンは変わります。')) return;
+    newGame(); V.modal = null; V.dlg = null; V.tab = 'home'; autoSave(); render();
+  },
+};
+window.ui = ui;
+
+/* =========================================================================
+   保存・読込（1スロット）
+   ========================================================================= */
+const SAVE_KEY = 'kakeuri.save.v1';
+function saveGame(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ S, cid:_cid })); return true; }
+  catch(e){ console.error(e); return false; }
+}
+function autoSave(){ try { saveGame(); } catch(e){} }
+function loadGame(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const o = JSON.parse(raw);
+    S = o.S; _cid = o.cid || 0;
+    // 乱数列を復元する（シード＋消費回数で再現）
+    RNG = mulberry32(S.seed);
+    const n = S.rngCount || 0; S.rngCount = 0;
+    for (let i=0;i<n;i++) RNG();
+    S.rngCount = n;
+    return true;
+  } catch(e){ console.error(e); return false; }
+}
+
+/* =========================================================================
+   起動
+   ========================================================================= */
+(function boot(){
+  try {
+    const t = localStorage.getItem('kakeuri.theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch(e){}
+  if (!loadGame()) newGame();
+  render();
+})();
+</script>
+</body>
+</html>
